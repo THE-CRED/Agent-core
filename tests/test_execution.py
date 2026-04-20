@@ -6,12 +6,11 @@ import asyncio
 from unittest.mock import patch
 
 import pytest
+from pydantic import BaseModel
 
 from agent.errors import (
     ProviderError,
-    RateLimitError,
     SchemaValidationError,
-    ToolExecutionError,
     UnsupportedFeatureError,
 )
 from agent.execution.retries import RetryHandler
@@ -26,12 +25,9 @@ from agent.middleware import Middleware, MiddlewareChain
 from agent.response import AgentResponse, Usage
 from agent.stream import AsyncStreamResponse, StreamResponse
 from agent.testing.fake_provider import FakeProvider, FakeResponse
-from agent.tools import Tool, tool
+from agent.tools import tool
 from agent.types.config import AgentConfig, RetryConfig, ToolLoopConfig
 from agent.types.tools import ToolCall, ToolResult
-
-from pydantic import BaseModel
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -438,7 +434,7 @@ class TestToolLoop:
         )
         loop = ToolLoop([greet_tool], config=ToolLoopConfig(max_iterations=3))
         request = AgentRequest(input="Hi")
-        response = loop.run_loop(request, fake_provider.run)
+        loop.run_loop(request, fake_provider.run)
         # Should have been called max_iterations times
         assert len(fake_provider.get_requests()) == 3
 

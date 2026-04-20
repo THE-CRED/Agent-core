@@ -67,7 +67,7 @@ class OpenAIProvider(BaseProvider):
     ):
         if not HAS_OPENAI:
             raise ImportError(
-                "OpenAI package not installed. Install with: pip install agent-runtime[openai]"
+                "OpenAI package not installed. Install with: pip install agent-core-py[openai]"
             )
 
         super().__init__(

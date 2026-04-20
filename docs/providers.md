@@ -16,7 +16,7 @@ Agent provides a unified interface across multiple LLM providers. This guide cov
 ### Setup
 
 ```bash
-pip install agent-runtime[openai]
+pip install agent-core-py[openai]
 export OPENAI_API_KEY="sk-..."
 ```
 
@@ -65,7 +65,7 @@ response = agent.run(messages=[message])
 ### Setup
 
 ```bash
-pip install agent-runtime[anthropic]
+pip install agent-core-py[anthropic]
 export ANTHROPIC_API_KEY="sk-ant-..."
 ```
 
@@ -111,7 +111,7 @@ response = agent.run(
 ### Setup
 
 ```bash
-pip install agent-runtime[gemini]
+pip install agent-core-py[gemini]
 export GOOGLE_API_KEY="..."
 ```
 
@@ -147,7 +147,7 @@ response = agent.run(enormous_document)
 ### Setup
 
 ```bash
-pip install agent-runtime[deepseek]
+pip install agent-core-py[deepseek]
 export DEEPSEEK_API_KEY="..."
 ```
 

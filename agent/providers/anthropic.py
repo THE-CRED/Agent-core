@@ -64,7 +64,7 @@ class AnthropicProvider(BaseProvider):
     ):
         if not HAS_ANTHROPIC:
             raise ImportError(
-                "Anthropic package not installed. Install with: pip install agent-runtime[anthropic]"
+                "Anthropic package not installed. Install with: pip install agent-core-py[anthropic]"
             )
 
         super().__init__(

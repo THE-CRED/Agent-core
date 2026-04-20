@@ -10,13 +10,13 @@
 Install the core package:
 
 ```bash
-pip install agent-runtime
+pip install agent-core-py
 ```
 
 Or using uv:
 
 ```bash
-uv add agent-runtime
+uv add agent-core-py
 ```
 
 ## Provider Extras
@@ -26,7 +26,7 @@ Agent supports multiple LLM providers. Install the extras for the providers you 
 ### OpenAI
 
 ```bash
-pip install agent-runtime[openai]
+pip install agent-core-py[openai]
 ```
 
 Required environment variable:
@@ -37,7 +37,7 @@ export OPENAI_API_KEY="sk-..."
 ### Anthropic
 
 ```bash
-pip install agent-runtime[anthropic]
+pip install agent-core-py[anthropic]
 ```
 
 Required environment variable:
@@ -48,7 +48,7 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 ### Google Gemini
 
 ```bash
-pip install agent-runtime[gemini]
+pip install agent-core-py[gemini]
 ```
 
 Required environment variable:
@@ -59,7 +59,7 @@ export GOOGLE_API_KEY="..."
 ### DeepSeek
 
 ```bash
-pip install agent-runtime[deepseek]
+pip install agent-core-py[deepseek]
 ```
 
 Required environment variable:
@@ -72,7 +72,7 @@ export DEEPSEEK_API_KEY="..."
 Install all provider dependencies at once:
 
 ```bash
-pip install agent-runtime[all]
+pip install agent-core-py[all]
 ```
 
 ## Development Installation
@@ -80,7 +80,7 @@ pip install agent-runtime[all]
 For contributing or development:
 
 ```bash
-git clone https://github.com/agent-runtime/agent.git
+git clone https://github.com/THE-CRED/Agent-core.git
 cd agent
 pip install -e ".[dev,all]"
 ```
@@ -121,7 +121,7 @@ agent providers  # List available providers
 
 You need to install the provider extra:
 ```bash
-pip install agent-runtime[openai]
+pip install agent-core-py[openai]
 ```
 
 ### AuthenticationError

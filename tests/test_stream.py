@@ -9,7 +9,6 @@ from agent.types.response import Usage
 from agent.types.stream import StreamEvent
 from agent.types.tools import ToolCall
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

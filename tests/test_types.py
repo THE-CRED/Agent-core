@@ -3,9 +3,6 @@
 import os
 from unittest.mock import patch
 
-import pytest
-from pydantic import BaseModel
-
 from agent.types.config import (
     BASE_URLS,
     ENV_VARS,
@@ -23,9 +20,8 @@ from agent.types.config import (
 from agent.types.messages import AgentRequest, ContentPart, Message
 from agent.types.response import AgentResponse, Usage
 from agent.types.router import RouteResult, RoutingStrategy
-from agent.types.stream import StreamEvent, StreamEventType
+from agent.types.stream import StreamEvent
 from agent.types.tools import ToolCall, ToolResult, ToolSpec
-
 
 # ── ContentPart ──────────────────────────────────────────────────
 

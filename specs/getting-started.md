@@ -6,15 +6,15 @@ Agent is a clean Python runtime for multi-provider LLM apps and agent workflows.
 
 ```bash
 # Base installation
-pip install agent-runtime
+pip install agent-core-py
 
 # With specific providers
-pip install agent-runtime[openai]
-pip install agent-runtime[anthropic]
-pip install agent-runtime[gemini]
+pip install agent-core-py[openai]
+pip install agent-core-py[anthropic]
+pip install agent-core-py[gemini]
 
 # All providers
-pip install agent-runtime[all]
+pip install agent-core-py[all]
 ```
 
 ## Quick Start

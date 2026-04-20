@@ -13,7 +13,7 @@ Thank you for your interest in contributing to Agent! This document provides gui
 
 ```bash
 # Clone the repository
-git clone https://github.com/agent-runtime/agent.git
+git clone https://github.com/THE-CRED/Agent-core.git
 cd agent
 
 # Create a virtual environment

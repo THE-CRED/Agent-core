@@ -18,12 +18,12 @@ Agent is a clean Python runtime for multi-provider LLM apps and agent workflows.
 ## Installation
 
 ```bash
-pip install agent-runtime
+pip install agent-core-py
 
 # With provider extras
-pip install agent-runtime[openai]
-pip install agent-runtime[anthropic]
-pip install agent-runtime[all]
+pip install agent-core-py[openai]
+pip install agent-core-py[anthropic]
+pip install agent-core-py[all]
 ```
 
 ## Quick Start
@@ -203,6 +203,10 @@ agent doctor
 - [Routing & Fallback](docs/routing.md)
 - [Middleware](docs/middleware.md)
 - [Custom Providers](docs/custom-providers.md)
+
+## Documentation
+
+Full docs at [agent-core.readthedocs.io](https://agent-core.readthedocs.io).
 
 ## Contributing
 

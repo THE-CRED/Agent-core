@@ -8,7 +8,6 @@ from agent.stores.base import SessionStore
 from agent.stores.memory import InMemoryStore
 from agent.stores.sqlite import SQLiteStore
 
-
 # ── SessionStore ABC ─────────────────────────────────────────────
 
 class TestSessionStoreABC:

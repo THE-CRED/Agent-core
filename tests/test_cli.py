@@ -1,14 +1,11 @@
 """Tests for agent.cli.main module."""
 
-import argparse
-import sys
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from agent.cli.main import cmd_doctor, cmd_providers, cmd_run, main
-
 
 # ---------------------------------------------------------------------------
 # main() entry point
@@ -142,7 +139,7 @@ class TestCmdRun:
         return SimpleNamespace(**defaults)
 
     @patch("agent.cli.main.Agent", create=True)
-    def test_run_normal_response(self, MockAgent, capsys):
+    def test_run_normal_response(self, mock_agent_cls, capsys):
         """cmd_run prints response text for non-streaming call."""
         mock_response = MagicMock()
         mock_response.text = "Hello there!"
@@ -158,7 +155,7 @@ class TestCmdRun:
         assert result == 0
 
     @patch("agent.cli.main.Agent", create=True)
-    def test_run_with_explicit_model(self, MockAgent, capsys):
+    def test_run_with_explicit_model(self, mock_agent_cls, capsys):
         """cmd_run uses explicit model when provided."""
         mock_response = MagicMock()
         mock_response.text = "response"
@@ -335,16 +332,16 @@ class TestCmdProviders:
 
     @patch("agent.cli.main._ensure_providers_loaded", create=True)
     @patch("agent.cli.main.ProviderRegistry", create=True)
-    def test_providers_returns_zero(self, MockRegistry, mock_ensure, capsys):
+    def test_providers_returns_zero(self, mock_registry, mock_ensure, capsys):
         """cmd_providers returns 0 and prints header."""
-        MockRegistry.list_providers.return_value = []
+        mock_registry.list_providers.return_value = []
         # Need to also patch the import inside the function
         with patch(
             "agent.providers.registry._ensure_providers_loaded"
         ), patch(
             "agent.providers.registry.ProviderRegistry"
-        ) as InnerRegistry:
-            InnerRegistry.list_providers.return_value = []
+        ) as inner_registry:
+            inner_registry.list_providers.return_value = []
             result = cmd_providers(SimpleNamespace())
 
         assert result == 0

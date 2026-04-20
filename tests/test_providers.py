@@ -13,7 +13,7 @@ from collections.abc import AsyncIterator, Iterator
 import pytest
 
 from agent.errors import ProviderError
-from agent.messages import AgentRequest, Message
+from agent.messages import AgentRequest
 from agent.providers.base import BaseProvider
 from agent.providers.registry import ProviderRegistry, get_provider
 from agent.response import AgentResponse, Usage
@@ -26,7 +26,6 @@ from agent.testing.fixtures import (
 )
 from agent.tools import ToolCall
 from agent.types.config import ProviderCapabilities
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -436,7 +435,10 @@ class TestFakeProviderSetResponse:
 
     def test_set_response_fn(self):
         p = FakeProvider()
-        fn = lambda req: FakeResponse(text=req.input or "")
+
+        def fn(req):
+            return FakeResponse(text=req.input or "")
+
         p.set_response_fn(fn)
         assert p._response_fn is fn
 

@@ -65,7 +65,7 @@ class GeminiProvider(BaseProvider):
         if not HAS_GEMINI:
             raise ImportError(
                 "Google Generative AI package not installed. "
-                "Install with: pip install agent-runtime[gemini]"
+                "Install with: pip install agent-core-py[gemini]"
             )
 
         super().__init__(

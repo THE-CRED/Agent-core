@@ -29,7 +29,8 @@ Welcome to the Agent documentation. This guide will help you get started with bu
 
 ## Quick Links
 
-- [GitHub Repository](https://github.com/agent-runtime/agent)
-- [PyPI Package](https://pypi.org/project/agent-runtime/)
+- [GitHub Repository](https://github.com/THE-CRED/Agent-core)
+- [PyPI Package](https://pypi.org/project/agent-core-py/)
+- [Documentation](https://agent-core.readthedocs.io)
 - [Changelog](../CHANGELOG.md)
 - [Contributing](../CONTRIBUTING.md)

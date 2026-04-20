@@ -6,17 +6,17 @@ Agent supports multiple LLM providers through a unified interface. This guide co
 
 | Provider | Package Extra | Environment Variable | Features |
 |----------|--------------|---------------------|----------|
-| OpenAI | `agent-runtime[openai]` | `OPENAI_API_KEY` | Streaming, Tools, JSON Mode, Vision |
-| Anthropic | `agent-runtime[anthropic]` | `ANTHROPIC_API_KEY` | Streaming, Tools, Vision |
-| Gemini | `agent-runtime[gemini]` | `GOOGLE_API_KEY` | Streaming, Tools, Vision |
-| DeepSeek | `agent-runtime[deepseek]` | `DEEPSEEK_API_KEY` | Streaming, Tools |
+| OpenAI | `agent-core-py[openai]` | `OPENAI_API_KEY` | Streaming, Tools, JSON Mode, Vision |
+| Anthropic | `agent-core-py[anthropic]` | `ANTHROPIC_API_KEY` | Streaming, Tools, Vision |
+| Gemini | `agent-core-py[gemini]` | `GOOGLE_API_KEY` | Streaming, Tools, Vision |
+| DeepSeek | `agent-core-py[deepseek]` | `DEEPSEEK_API_KEY` | Streaming, Tools |
 
 ## OpenAI
 
 ### Installation
 
 ```bash
-pip install agent-runtime[openai]
+pip install agent-core-py[openai]
 ```
 
 ### Configuration
@@ -89,7 +89,7 @@ agent = Agent(
 ### Installation
 
 ```bash
-pip install agent-runtime[anthropic]
+pip install agent-core-py[anthropic]
 ```
 
 ### Configuration
@@ -165,7 +165,7 @@ response = agent.run("Hello", system="Be concise.")
 ### Installation
 
 ```bash
-pip install agent-runtime[gemini]
+pip install agent-core-py[gemini]
 ```
 
 ### Configuration
@@ -225,7 +225,7 @@ agent = Agent(
 ### Installation
 
 ```bash
-pip install agent-runtime[deepseek]
+pip install agent-core-py[deepseek]
 ```
 
 ### Configuration

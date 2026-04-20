@@ -54,7 +54,7 @@ class DeepSeekProvider(BaseProvider):
         if not HAS_OPENAI:
             raise ImportError(
                 "OpenAI package not installed (required for DeepSeek). "
-                "Install with: pip install agent-runtime[deepseek]"
+                "Install with: pip install agent-core-py[deepseek]"
             )
 
         super().__init__(
