@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install ruff ty
+      - run: pip install -e ".[all,dev]" ruff ty
       - name: Ruff check
         run: ruff check .
       - name: Ruff format check
