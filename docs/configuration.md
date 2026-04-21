@@ -6,6 +6,7 @@ Agent provides flexible configuration options for customizing behavior, authenti
 
 ### Basic Configuration
 
+
 ```python
 from agent import Agent
 
