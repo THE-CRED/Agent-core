@@ -391,9 +391,7 @@ class TestAsyncStreamResponseProviderModel:
 
     @pytest.mark.asyncio
     async def test_custom_values(self):
-        asr = AsyncStreamResponse(
-            _async_events_iter([]), provider="openai", model="gpt-4"
-        )
+        asr = AsyncStreamResponse(_async_events_iter([]), provider="openai", model="gpt-4")
         assert asr.provider == "openai"
         assert asr.model == "gpt-4"
 

@@ -1,6 +1,5 @@
 """Tests for the Agent class."""
 
-
 from agent import AgentResponse
 from agent.testing import FakeResponse, create_test_agent
 
@@ -68,11 +67,13 @@ class TestAgent:
     def test_multiple_responses(self):
         """Test multiple responses in sequence."""
         agent, provider = create_test_agent()
-        provider.set_responses([
-            FakeResponse(text="First"),
-            FakeResponse(text="Second"),
-            FakeResponse(text="Third"),
-        ])
+        provider.set_responses(
+            [
+                FakeResponse(text="First"),
+                FakeResponse(text="Second"),
+                FakeResponse(text="Third"),
+            ]
+        )
 
         r1 = agent.run("1")
         r2 = agent.run("2")
@@ -94,10 +95,13 @@ class TestAgent:
         """Test response includes usage information."""
         agent, provider = create_test_agent()
         from agent.response import Usage
-        provider.set_response(FakeResponse(
-            text="Hi",
-            usage=Usage(prompt_tokens=10, completion_tokens=5, total_tokens=15),
-        ))
+
+        provider.set_response(
+            FakeResponse(
+                text="Hi",
+                usage=Usage(prompt_tokens=10, completion_tokens=5, total_tokens=15),
+            )
+        )
 
         response = agent.run("Hello")
 

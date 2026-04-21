@@ -49,9 +49,9 @@ class ExecutionRuntime:
         self.config = config
         self.tools = tools or []
         self.middleware = middleware or MiddlewareChain()
-        self.retry_handler = RetryHandler(retry_config or RetryConfig(
-            max_retries=config.max_retries
-        ))
+        self.retry_handler = RetryHandler(
+            retry_config or RetryConfig(max_retries=config.max_retries)
+        )
         self.tool_loop = ToolLoop(self.tools, tool_loop_config) if self.tools else None
 
     def run(
@@ -107,9 +107,7 @@ class ExecutionRuntime:
                 )
             else:
                 # Simple execution
-                response = self.retry_handler.execute(
-                    lambda: self.provider.run(request)
-                )
+                response = self.retry_handler.execute(lambda: self.provider.run(request))
 
             # Parse structured output
             if output_handler and response.text:

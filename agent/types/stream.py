@@ -57,9 +57,7 @@ class StreamEvent(BaseModel):
         )
 
     @classmethod
-    def tool_result_event(
-        cls, tool_call_id: str, result: str, raw: Any = None
-    ) -> "StreamEvent":
+    def tool_result_event(cls, tool_call_id: str, result: str, raw: Any = None) -> "StreamEvent":
         """Create a tool result event."""
         return cls(type="tool_result", tool_result=result, raw=raw)
 

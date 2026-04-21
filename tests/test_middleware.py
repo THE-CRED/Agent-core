@@ -28,6 +28,7 @@ def _make_response(text="test response", usage=None, latency_ms=None):
 
 # ── Base Middleware ───────────────────────────────────────────────
 
+
 class TestMiddleware:
     def test_before_passthrough(self):
         mw = Middleware()
@@ -48,6 +49,7 @@ class TestMiddleware:
 
 
 # ── LoggingMiddleware ────────────────────────────────────────────
+
 
 class TestLoggingMiddleware:
     def test_before_logs_input(self):
@@ -100,6 +102,7 @@ class TestLoggingMiddleware:
 
 
 # ── MetricsMiddleware ────────────────────────────────────────────
+
 
 class TestMetricsMiddleware:
     def test_initial_state(self):
@@ -160,6 +163,7 @@ class TestMetricsMiddleware:
 
 # ── RedactionMiddleware ──────────────────────────────────────────
 
+
 class TestRedactionMiddleware:
     def test_default_patterns(self):
         mw = RedactionMiddleware()
@@ -204,6 +208,7 @@ class TestRedactionMiddleware:
 
 # ── RetryPolicyMiddleware ────────────────────────────────────────
 
+
 class TestRetryPolicyMiddleware:
     def test_defaults(self):
         mw = RetryPolicyMiddleware()
@@ -232,6 +237,7 @@ class TestRetryPolicyMiddleware:
 
 
 # ── MiddlewareChain ──────────────────────────────────────────────
+
 
 class TestMiddlewareChain:
     def test_empty_chain(self):

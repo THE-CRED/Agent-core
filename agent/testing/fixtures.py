@@ -99,7 +99,8 @@ def create_test_response(
         content=[{"type": "text", "text": text}] if text else [],
         provider=provider,
         model=model,
-        usage=usage or Usage(
+        usage=usage
+        or Usage(
             prompt_tokens=10,
             completion_tokens=20,
             total_tokens=30,
@@ -147,9 +148,7 @@ class AgentTestCase:
         tool_id: str = "call_123",
     ) -> None:
         """Set a tool call response."""
-        self.provider.set_response(
-            FakeResponse.with_tool_call(tool_name, arguments, tool_id)
-        )
+        self.provider.set_response(FakeResponse.with_tool_call(tool_name, arguments, tool_id))
 
     def set_error(self, error: Exception) -> None:
         """Set an error response."""

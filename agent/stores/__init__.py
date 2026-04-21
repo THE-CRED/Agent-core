@@ -13,6 +13,7 @@ __all__ = [
 # Optional stores (may not be available)
 try:
     from agent.stores.sqlite import SQLiteStore  # noqa: F401
+
     __all__.append("SQLiteStore")
 except ImportError:
     pass

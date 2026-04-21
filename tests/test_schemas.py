@@ -20,6 +20,7 @@ class Address(BaseModel):
 
 # ── Schema ───────────────────────────────────────────────────────
 
+
 class TestSchema:
     def test_pydantic_schema(self):
         s = Schema(Person)
@@ -101,6 +102,7 @@ class TestSchema:
 
 # ── schema_to_prompt ─────────────────────────────────────────────
 
+
 class TestSchemaToPrompt:
     def test_contains_schema(self):
         s = Schema(Person)
@@ -121,6 +123,7 @@ class TestSchemaToPrompt:
 
 
 # ── extract_json ─────────────────────────────────────────────────
+
 
 class TestExtractJson:
     def test_plain_json(self):
@@ -155,7 +158,7 @@ class TestExtractJson:
             extract_json("no json here at all")
 
     def test_array_json(self):
-        result = extract_json('[1, 2, 3]')
+        result = extract_json("[1, 2, 3]")
         assert result == [1, 2, 3]
 
     def test_multiple_code_blocks_first_valid(self):
@@ -166,18 +169,21 @@ class TestExtractJson:
 
 # ── repair_json ──────────────────────────────────────────────────
 
+
 class TestRepairJson:
     def test_trailing_comma_object(self):
         text = '{"a": 1, "b": 2,}'
         repaired = repair_json(text, ValueError("test"))
         import json
+
         result = json.loads(repaired)
         assert result == {"a": 1, "b": 2}
 
     def test_trailing_comma_array(self):
-        text = '[1, 2, 3,]'
+        text = "[1, 2, 3,]"
         repaired = repair_json(text, ValueError("test"))
         import json
+
         result = json.loads(repaired)
         assert result == [1, 2, 3]
 
@@ -187,7 +193,7 @@ class TestRepairJson:
         assert repaired.count("{") == repaired.count("}")
 
     def test_missing_closing_bracket(self):
-        text = '[1, 2, 3'
+        text = "[1, 2, 3"
         repaired = repair_json(text, ValueError("test"))
         assert repaired.count("[") == repaired.count("]")
 
@@ -200,6 +206,7 @@ class TestRepairJson:
         text = '{"a": 1}'
         repaired = repair_json(text, ValueError("test"))
         import json
+
         assert json.loads(repaired) == {"a": 1}
 
     def test_combined_issues(self):

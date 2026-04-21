@@ -55,6 +55,7 @@ def greet_tool():
     def greet(name: str) -> str:
         """Greet someone."""
         return f"Hello, {name}!"
+
     return greet
 
 
@@ -64,6 +65,7 @@ def failing_tool():
     def explode(msg: str) -> str:
         """Always fails."""
         raise RuntimeError(msg)
+
     return explode
 
 
@@ -398,9 +400,7 @@ class TestToolLoop:
             provider="fake",
             model="fake",
         )
-        results = [
-            ToolResult(tool_call_id="c1", name="greet", content="Hello, W!", is_error=False)
-        ]
+        results = [ToolResult(tool_call_id="c1", name="greet", content="Hello, W!", is_error=False)]
         messages = loop.build_tool_messages(response, results)
         assert len(messages) == 2
         assert messages[0].role == "assistant"
@@ -416,10 +416,12 @@ class TestToolLoop:
 
     def test_run_loop_with_tool_iteration(self, greet_tool, fake_provider):
         tc = ToolCall(id="c1", name="greet", arguments={"name": "Loop"})
-        fake_provider.set_responses([
-            FakeResponse(text="", tool_calls=[tc], stop_reason="tool_calls"),
-            FakeResponse(text="Done after tool"),
-        ])
+        fake_provider.set_responses(
+            [
+                FakeResponse(text="", tool_calls=[tc], stop_reason="tool_calls"),
+                FakeResponse(text="Done after tool"),
+            ]
+        )
         loop = ToolLoop([greet_tool])
         request = AgentRequest(input="Hi")
         response = loop.run_loop(request, fake_provider.run)
@@ -429,9 +431,7 @@ class TestToolLoop:
     def test_run_loop_respects_max_iterations(self, greet_tool, fake_provider):
         tc = ToolCall(id="c1", name="greet", arguments={"name": "Loop"})
         # Always returns tool calls, never a final answer
-        fake_provider.set_response(
-            FakeResponse(text="", tool_calls=[tc], stop_reason="tool_calls")
-        )
+        fake_provider.set_response(FakeResponse(text="", tool_calls=[tc], stop_reason="tool_calls"))
         loop = ToolLoop([greet_tool], config=ToolLoopConfig(max_iterations=3))
         request = AgentRequest(input="Hi")
         loop.run_loop(request, fake_provider.run)
@@ -441,10 +441,12 @@ class TestToolLoop:
     @pytest.mark.asyncio
     async def test_run_loop_async_with_tool_iteration(self, greet_tool, fake_provider):
         tc = ToolCall(id="c1", name="greet", arguments={"name": "Async"})
-        fake_provider.set_responses([
-            FakeResponse(text="", tool_calls=[tc], stop_reason="tool_calls"),
-            FakeResponse(text="Async done"),
-        ])
+        fake_provider.set_responses(
+            [
+                FakeResponse(text="", tool_calls=[tc], stop_reason="tool_calls"),
+                FakeResponse(text="Async done"),
+            ]
+        )
         loop = ToolLoop([greet_tool])
         request = AgentRequest(input="Hi")
         response = await loop.run_loop_async(request, fake_provider.run_async)
@@ -471,10 +473,12 @@ class TestExecutionRuntime:
         assert response.latency_ms > 0
 
     def test_run_records_cost_estimate(self, fake_provider, agent_config, simple_request):
-        fake_provider.set_response(FakeResponse(
-            text="answer",
-            usage=Usage(prompt_tokens=100, completion_tokens=50, total_tokens=150),
-        ))
+        fake_provider.set_response(
+            FakeResponse(
+                text="answer",
+                usage=Usage(prompt_tokens=100, completion_tokens=50, total_tokens=150),
+            )
+        )
         runtime = ExecutionRuntime(provider=fake_provider, config=agent_config)
         response = runtime.run(simple_request)
         # cost_estimate may be None for unknown models; just ensure no crash
@@ -504,7 +508,9 @@ class TestExecutionRuntime:
         assert response.text == "recovered"
         assert call_count == 2
 
-    def test_run_with_middleware_before_and_after(self, fake_provider, agent_config, simple_request):
+    def test_run_with_middleware_before_and_after(
+        self, fake_provider, agent_config, simple_request
+    ):
         fake_provider.set_response(FakeResponse(text="answer"))
 
         class TaggingMiddleware(Middleware):
@@ -563,10 +569,12 @@ class TestExecutionRuntime:
 
     def test_run_with_tools(self, fake_provider, agent_config, greet_tool):
         tc = ToolCall(id="c1", name="greet", arguments={"name": "Runtime"})
-        fake_provider.set_responses([
-            FakeResponse(text="", tool_calls=[tc], stop_reason="tool_calls"),
-            FakeResponse(text="Greeted via runtime"),
-        ])
+        fake_provider.set_responses(
+            [
+                FakeResponse(text="", tool_calls=[tc], stop_reason="tool_calls"),
+                FakeResponse(text="Greeted via runtime"),
+            ]
+        )
         runtime = ExecutionRuntime(
             provider=fake_provider,
             config=agent_config,
@@ -578,9 +586,7 @@ class TestExecutionRuntime:
     def test_run_with_tools_unsupported_provider(self, agent_config, greet_tool):
         """Provider that doesn't support tools raises UnsupportedFeatureError."""
         provider = FakeProvider()
-        provider.capabilities = provider.capabilities.model_copy(
-            update={"tools": False}
-        )
+        provider.capabilities = provider.capabilities.model_copy(update={"tools": False})
         runtime = ExecutionRuntime(
             provider=provider,
             config=agent_config,
@@ -591,9 +597,7 @@ class TestExecutionRuntime:
             runtime.run(AgentRequest(input="Hi"))
 
     def test_run_with_structured_output_native(self, fake_provider, agent_config):
-        fake_provider.set_response(
-            FakeResponse(text='{"name": "Alice", "age": 30}')
-        )
+        fake_provider.set_response(FakeResponse(text='{"name": "Alice", "age": 30}'))
         runtime = ExecutionRuntime(provider=fake_provider, config=agent_config)
         response = runtime.run(AgentRequest(input="person"), schema=PersonSchema)
         assert response.output is not None
@@ -617,9 +621,7 @@ class TestExecutionRuntime:
         assert response.output is not None
         assert response.output.name == "Bob"
 
-    def test_run_structured_output_parse_failure_does_not_crash(
-        self, fake_provider, agent_config
-    ):
+    def test_run_structured_output_parse_failure_does_not_crash(self, fake_provider, agent_config):
         fake_provider.set_response(FakeResponse(text="not json"))
         runtime = ExecutionRuntime(provider=fake_provider, config=agent_config)
         response = runtime.run(AgentRequest(input="person"), schema=PersonSchema)
@@ -633,17 +635,13 @@ class TestExecutionRuntime:
 
     def test_stream_unsupported_raises(self, agent_config, simple_request):
         provider = FakeProvider()
-        provider.capabilities = provider.capabilities.model_copy(
-            update={"streaming": False}
-        )
+        provider.capabilities = provider.capabilities.model_copy(update={"streaming": False})
         runtime = ExecutionRuntime(provider=provider, config=agent_config)
         with pytest.raises(UnsupportedFeatureError):
             runtime.stream(simple_request)
 
     @pytest.mark.asyncio
-    async def test_run_async_simple_success(
-        self, fake_provider, agent_config, simple_request
-    ):
+    async def test_run_async_simple_success(self, fake_provider, agent_config, simple_request):
         fake_provider.set_response(FakeResponse(text="async hi"))
         runtime = ExecutionRuntime(provider=fake_provider, config=agent_config)
         response = await runtime.run_async(simple_request)
@@ -653,10 +651,12 @@ class TestExecutionRuntime:
     @pytest.mark.asyncio
     async def test_run_async_with_tools(self, fake_provider, agent_config, greet_tool):
         tc = ToolCall(id="c1", name="greet", arguments={"name": "AsyncRT"})
-        fake_provider.set_responses([
-            FakeResponse(text="", tool_calls=[tc], stop_reason="tool_calls"),
-            FakeResponse(text="Async greeted"),
-        ])
+        fake_provider.set_responses(
+            [
+                FakeResponse(text="", tool_calls=[tc], stop_reason="tool_calls"),
+                FakeResponse(text="Async greeted"),
+            ]
+        )
         runtime = ExecutionRuntime(
             provider=fake_provider,
             config=agent_config,
@@ -666,12 +666,8 @@ class TestExecutionRuntime:
         assert response.text == "Async greeted"
 
     @pytest.mark.asyncio
-    async def test_run_async_middleware_error_suppression(
-        self, fake_provider, agent_config
-    ):
-        fake_provider.set_response(
-            FakeResponse.with_error(ProviderError("boom", status_code=500))
-        )
+    async def test_run_async_middleware_error_suppression(self, fake_provider, agent_config):
+        fake_provider.set_response(FakeResponse.with_error(ProviderError("boom", status_code=500)))
 
         class SuppressingMiddleware(Middleware):
             def on_error(self, request, error):
@@ -699,9 +695,7 @@ class TestExecutionRuntime:
     @pytest.mark.asyncio
     async def test_stream_async_unsupported_raises(self, agent_config, simple_request):
         provider = FakeProvider()
-        provider.capabilities = provider.capabilities.model_copy(
-            update={"streaming": False}
-        )
+        provider.capabilities = provider.capabilities.model_copy(update={"streaming": False})
         runtime = ExecutionRuntime(provider=provider, config=agent_config)
         with pytest.raises(UnsupportedFeatureError):
             await runtime.stream_async(simple_request)

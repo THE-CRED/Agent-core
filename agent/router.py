@@ -392,10 +392,7 @@ class AgentRouter:
     def _run_fastest_sync(self, request: AgentRequest) -> AgentResponse:
         """Race agents synchronously (uses threads)."""
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(self.agents)) as executor:
-            futures = {
-                executor.submit(agent._runtime.run, request): agent
-                for agent in self.agents
-            }
+            futures = {executor.submit(agent._runtime.run, request): agent for agent in self.agents}
 
             errors: list[Exception] = []
             for future in concurrent.futures.as_completed(futures):
@@ -412,10 +409,7 @@ class AgentRouter:
 
     async def _run_fastest_async(self, request: AgentRequest) -> AgentResponse:
         """Race agents, return first successful response."""
-        tasks = [
-            asyncio.create_task(agent._runtime.run_async(request))
-            for agent in self.agents
-        ]
+        tasks = [asyncio.create_task(agent._runtime.run_async(request)) for agent in self.agents]
 
         errors: list[Exception] = []
         done, pending = await asyncio.wait(
@@ -450,6 +444,7 @@ class AgentRouter:
 
     def _run_cheapest(self, request: AgentRequest) -> AgentResponse:
         """Use the cheapest available agent."""
+
         # Sort agents by estimated cost
         def get_cost(agent: Agent) -> float:
             model = resolve_model(agent.model)
@@ -473,6 +468,7 @@ class AgentRouter:
 
     async def _run_cheapest_async(self, request: AgentRequest) -> AgentResponse:
         """Use the cheapest available agent (async)."""
+
         def get_cost(agent: Agent) -> float:
             model = resolve_model(agent.model)
             pricing = PRICING.get(model, {})
@@ -587,6 +583,7 @@ class AgentRouter:
             return self.agents[start:] + self.agents[:start]
 
         if self.strategy == RoutingStrategy.CHEAPEST:
+
             def get_cost(agent: Agent) -> float:
                 model = resolve_model(agent.model)
                 pricing = PRICING.get(model, {})

@@ -25,6 +25,7 @@ from agent.types.tools import ToolCall, ToolResult, ToolSpec
 
 # ── ContentPart ──────────────────────────────────────────────────
 
+
 class TestContentPart:
     def test_text_part(self):
         p = ContentPart.text_part("hello")
@@ -48,6 +49,7 @@ class TestContentPart:
 
 
 # ── Message ──────────────────────────────────────────────────────
+
 
 class TestMessage:
     def test_system(self):
@@ -104,6 +106,7 @@ class TestMessage:
 
 # ── AgentRequest ─────────────────────────────────────────────────
 
+
 class TestAgentRequest:
     def test_defaults(self):
         r = AgentRequest()
@@ -149,6 +152,7 @@ class TestAgentRequest:
 
 # ── Usage ────────────────────────────────────────────────────────
 
+
 class TestUsage:
     def test_defaults(self):
         u = Usage()
@@ -173,6 +177,7 @@ class TestUsage:
 
 
 # ── AgentResponse ────────────────────────────────────────────────
+
 
 class TestAgentResponse:
     def test_defaults(self):
@@ -222,12 +227,17 @@ class TestAgentResponse:
 
 # ── ToolSpec ─────────────────────────────────────────────────────
 
+
 class TestToolSpec:
     def _make_spec(self):
         return ToolSpec(
             name="search",
             description="Search items",
-            parameters={"type": "object", "properties": {"q": {"type": "string"}}, "required": ["q"]},
+            parameters={
+                "type": "object",
+                "properties": {"q": {"type": "string"}},
+                "required": ["q"],
+            },
         )
 
     def test_to_openai_schema(self):
@@ -249,6 +259,7 @@ class TestToolSpec:
 
 
 # ── ToolCall ─────────────────────────────────────────────────────
+
 
 class TestToolCall:
     def test_to_dict(self):
@@ -273,6 +284,7 @@ class TestToolCall:
 
 # ── ToolResult ───────────────────────────────────────────────────
 
+
 class TestToolResult:
     def test_to_dict(self):
         tr = ToolResult(tool_call_id="c1", name="search", content="found it", is_error=False)
@@ -287,6 +299,7 @@ class TestToolResult:
 
 
 # ── StreamEvent ──────────────────────────────────────────────────
+
 
 class TestStreamEvent:
     def test_text_delta(self):
@@ -342,6 +355,7 @@ class TestStreamEvent:
 
 # ── RoutingStrategy ──────────────────────────────────────────────
 
+
 class TestRoutingStrategy:
     def test_values(self):
         assert RoutingStrategy.FALLBACK.value == "fallback"
@@ -360,6 +374,7 @@ class TestRoutingStrategy:
 
 # ── RouteResult ──────────────────────────────────────────────────
 
+
 class TestRouteResult:
     def test_basic(self):
         r = RouteResult(agent="agent_obj", reason="cheapest")
@@ -372,6 +387,7 @@ class TestRouteResult:
 
 
 # ── Config Functions ─────────────────────────────────────────────
+
 
 class TestConfigFunctions:
     def test_env_vars_has_known_providers(self):
@@ -439,6 +455,7 @@ class TestConfigFunctions:
 
 # ── ProviderCapabilities ─────────────────────────────────────────
 
+
 class TestProviderCapabilities:
     def test_defaults(self):
         c = ProviderCapabilities()
@@ -455,6 +472,7 @@ class TestProviderCapabilities:
 
 
 # ── AgentConfig ──────────────────────────────────────────────────
+
 
 class TestAgentConfig:
     def test_basic_creation(self):
@@ -500,6 +518,7 @@ class TestAgentConfig:
 
 # ── RetryConfig ──────────────────────────────────────────────────
 
+
 class TestRetryConfig:
     def test_defaults(self):
         c = RetryConfig()
@@ -511,23 +530,27 @@ class TestRetryConfig:
 
     def test_should_retry_rate_limit(self):
         from agent.errors import RateLimitError
+
         c = RetryConfig(max_retries=3)
         assert c.should_retry(RateLimitError("limited"), attempt=0) is True
         assert c.should_retry(RateLimitError("limited"), attempt=2) is True
 
     def test_should_retry_exhausted(self):
         from agent.errors import RateLimitError
+
         c = RetryConfig(max_retries=2)
         assert c.should_retry(RateLimitError("limited"), attempt=2) is False
 
     def test_should_retry_5xx(self):
         from agent.errors import ProviderError
+
         c = RetryConfig(max_retries=3)
         assert c.should_retry(ProviderError("err", status_code=500), attempt=0) is True
         assert c.should_retry(ProviderError("err", status_code=503), attempt=0) is True
 
     def test_should_not_retry_4xx(self):
         from agent.errors import ProviderError
+
         c = RetryConfig(max_retries=3)
         assert c.should_retry(ProviderError("err", status_code=400), attempt=0) is False
         assert c.should_retry(ProviderError("err", status_code=404), attempt=0) is False
@@ -542,6 +565,7 @@ class TestRetryConfig:
 
     def test_get_delay_with_retry_after(self):
         from agent.errors import RateLimitError
+
         c = RetryConfig()
         e = RateLimitError("limited", retry_after=5.0)
         delay = c.get_delay(0, error=e)
@@ -549,6 +573,7 @@ class TestRetryConfig:
 
     def test_get_delay_retry_after_capped(self):
         from agent.errors import RateLimitError
+
         c = RetryConfig(max_delay=10.0)
         e = RateLimitError("limited", retry_after=100.0)
         delay = c.get_delay(0, error=e)
@@ -571,6 +596,7 @@ class TestRetryConfig:
 
 
 # ── ToolLoopConfig ───────────────────────────────────────────────
+
 
 class TestToolLoopConfig:
     def test_defaults(self):

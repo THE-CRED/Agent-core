@@ -10,6 +10,7 @@ from agent import Agent, AgentRouter
 # Basic Fallback
 # ============================================================================
 
+
 def basic_fallback():
     """Automatic failover between providers."""
     # Primary: Anthropic, Fallback: OpenAI
@@ -29,6 +30,7 @@ def basic_fallback():
 # ============================================================================
 # Round Robin Load Balancing
 # ============================================================================
+
 
 def round_robin():
     """Distribute load across providers."""
@@ -50,6 +52,7 @@ def round_robin():
 # Cheapest Provider
 # ============================================================================
 
+
 def cheapest_first():
     """Route to cheapest available provider."""
     router = AgentRouter(
@@ -68,6 +71,7 @@ def cheapest_first():
 # ============================================================================
 # Streaming with Fallback
 # ============================================================================
+
 
 def streaming_fallback():
     """Stream with automatic failover."""
@@ -89,6 +93,7 @@ def streaming_fallback():
 # ============================================================================
 # Structured Output with Fallback
 # ============================================================================
+
 
 def json_fallback():
     """Structured output with fallback."""
@@ -119,6 +124,7 @@ def json_fallback():
 # ============================================================================
 # Custom Routing Strategy
 # ============================================================================
+
 
 def custom_routing():
     """Custom routing logic."""
@@ -166,6 +172,7 @@ def custom_routing():
 # ============================================================================
 # Production Pattern
 # ============================================================================
+
 
 def production_pattern():
     """

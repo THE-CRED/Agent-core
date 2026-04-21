@@ -12,8 +12,10 @@ from agent import Agent
 # Basic Structured Output
 # ============================================================================
 
+
 class MovieReview(BaseModel):
     """A movie review with structured fields."""
+
     title: str
     rating: int = Field(ge=1, le=10, description="Rating from 1-10")
     summary: str
@@ -45,8 +47,10 @@ def basic_structured():
 # Nested Structures
 # ============================================================================
 
+
 class Address(BaseModel):
     """A physical address."""
+
     street: str
     city: str
     country: str
@@ -55,6 +59,7 @@ class Address(BaseModel):
 
 class Person(BaseModel):
     """A person with contact information."""
+
     name: str
     age: int
     email: str
@@ -84,8 +89,10 @@ def nested_structures():
 # Data Extraction
 # ============================================================================
 
+
 class ExtractedEntities(BaseModel):
     """Entities extracted from text."""
+
     people: list[str] = Field(description="Names of people mentioned")
     organizations: list[str] = Field(description="Organizations mentioned")
     locations: list[str] = Field(description="Locations mentioned")
@@ -122,8 +129,10 @@ def entity_extraction():
 # Classification
 # ============================================================================
 
+
 class SentimentAnalysis(BaseModel):
     """Sentiment analysis result."""
+
     sentiment: str = Field(description="positive, negative, or neutral")
     confidence: float = Field(ge=0, le=1, description="Confidence score 0-1")
     key_phrases: list[str] = Field(description="Key phrases that indicate sentiment")
@@ -159,8 +168,10 @@ def sentiment_classification():
 # Code Analysis
 # ============================================================================
 
+
 class CodeReview(BaseModel):
     """Code review result."""
+
     issues: list[str] = Field(description="List of issues found")
     suggestions: list[str] = Field(description="Improvement suggestions")
     complexity_score: int = Field(ge=1, le=10, description="Complexity 1-10")
@@ -174,12 +185,12 @@ def code_analysis():
         model="claude-sonnet",
     )
 
-    code = '''
+    code = """
 def process_user_input(user_data):
     query = f"SELECT * FROM users WHERE id = {user_data['id']}"
     result = db.execute(query)
     return eval(result[0]['data'])
-    '''
+    """
 
     response = agent.json(
         f"Review this Python code for issues:\n\n```python\n{code}\n```",

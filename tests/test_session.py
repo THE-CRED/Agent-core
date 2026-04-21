@@ -1,6 +1,5 @@
 """Tests for the Session class."""
 
-
 from agent.session import Session
 from agent.testing import FakeResponse, create_test_agent
 
@@ -48,10 +47,12 @@ class TestSession:
     def test_session_maintains_history(self):
         """Test that session maintains conversation history."""
         agent, provider = create_test_agent()
-        provider.set_responses([
-            FakeResponse(text="Nice to meet you!"),
-            FakeResponse(text="Your name is Alice."),
-        ])
+        provider.set_responses(
+            [
+                FakeResponse(text="Nice to meet you!"),
+                FakeResponse(text="Your name is Alice."),
+            ]
+        )
 
         session = agent.session()
         session.run("My name is Alice")
@@ -90,10 +91,12 @@ class TestSession:
     def test_session_fork_is_independent(self):
         """Test that forked session is independent."""
         agent, provider = create_test_agent()
-        provider.set_responses([
-            FakeResponse(text="First"),
-            FakeResponse(text="Second"),
-        ])
+        provider.set_responses(
+            [
+                FakeResponse(text="First"),
+                FakeResponse(text="Second"),
+            ]
+        )
 
         session = agent.session()
         session.run("One")

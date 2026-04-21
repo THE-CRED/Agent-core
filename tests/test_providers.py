@@ -418,7 +418,6 @@ class TestFakeProviderInit:
 
 
 class TestFakeProviderSetResponse:
-
     def test_set_response(self):
         p = FakeProvider()
         r = FakeResponse(text="x")
@@ -444,7 +443,6 @@ class TestFakeProviderSetResponse:
 
 
 class TestFakeProviderRequestTracking:
-
     def test_get_requests_empty(self):
         p = FakeProvider()
         assert p.get_requests() == []
@@ -519,7 +517,6 @@ class TestFakeProviderResponseCycling:
 
 
 class TestFakeProviderRun:
-
     def test_run_returns_agent_response(self):
         p = FakeProvider()
         p.set_response(FakeResponse(text="hello"))
@@ -591,7 +588,6 @@ class TestFakeProviderRun:
 
 
 class TestFakeProviderRunAsync:
-
     def test_run_async_returns_same_as_run(self):
         p = FakeProvider()
         p.set_response(FakeResponse(text="async_test"))
@@ -697,7 +693,6 @@ class TestFakeProviderStream:
 
 
 class TestFakeProviderStreamAsync:
-
     def test_stream_async(self):
         p = FakeProvider()
         p.set_response(FakeResponse(text="async stream"))
@@ -759,7 +754,6 @@ class TestFakeProviderRegistration:
 
 
 class TestCreateTestResponse:
-
     def test_defaults(self):
         resp = create_test_response()
         assert resp.text == "Test response"

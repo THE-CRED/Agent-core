@@ -10,6 +10,7 @@ from agent.stores.sqlite import SQLiteStore
 
 # ── SessionStore ABC ─────────────────────────────────────────────
 
+
 class TestSessionStoreABC:
     def test_cannot_instantiate(self):
         with pytest.raises(TypeError):
@@ -26,11 +27,13 @@ class TestSessionStoreABC:
             def save(self, session_id, data): ...
             def load(self, session_id): ...
             def delete(self, session_id): ...
+
         with pytest.raises(TypeError):
             Partial()
 
 
 # ── Shared store tests (parametrized) ────────────────────────────
+
 
 @pytest.fixture
 def memory_store():
@@ -117,6 +120,7 @@ class TestSharedStoreBehaviour:
 
 # ── InMemoryStore-specific ───────────────────────────────────────
 
+
 class TestInMemoryStore:
     def test_len_empty(self):
         assert len(InMemoryStore()) == 0
@@ -157,6 +161,7 @@ class TestInMemoryStore:
 
 
 # ── SQLiteStore-specific ─────────────────────────────────────────
+
 
 class TestSQLiteStore:
     def test_is_subclass(self):

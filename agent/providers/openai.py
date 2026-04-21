@@ -30,6 +30,7 @@ try:
     import openai
     from openai import AsyncOpenAI, OpenAI
     from openai.types.chat import ChatCompletion, ChatCompletionChunk
+
     HAS_OPENAI = True
 except ImportError:
     HAS_OPENAI = False
@@ -258,17 +259,21 @@ class OpenAIProvider(BaseProvider):
                 if part.type == "text" and part.text:
                     parts.append({"type": "text", "text": part.text})
                 elif part.type == "image_url" and part.image_url:
-                    parts.append({
-                        "type": "image_url",
-                        "image_url": {"url": part.image_url},
-                    })
+                    parts.append(
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": part.image_url},
+                        }
+                    )
                 elif part.type == "image" and part.image_data:
                     b64_data = base64.b64encode(part.image_data).decode()
                     media_type = part.media_type or "image/png"
-                    parts.append({
-                        "type": "image_url",
-                        "image_url": {"url": f"data:{media_type};base64,{b64_data}"},
-                    })
+                    parts.append(
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:{media_type};base64,{b64_data}"},
+                        }
+                    )
             result["content"] = parts
 
         # Handle tool-related fields
@@ -344,7 +349,9 @@ class OpenAIProvider(BaseProvider):
                     ToolCall(
                         id=tc.id,
                         name=tc.function.name,
-                        arguments=json.loads(tc.function.arguments) if tc.function.arguments else {},
+                        arguments=json.loads(tc.function.arguments)
+                        if tc.function.arguments
+                        else {},
                     )
                 )
 

@@ -164,7 +164,8 @@ class FakeProvider(BaseProvider):
             content=[{"type": "text", "text": fake_response.text}] if fake_response.text else [],
             provider=self.name,
             model="fake-model",
-            usage=fake_response.usage or Usage(
+            usage=fake_response.usage
+            or Usage(
                 prompt_tokens=10,
                 completion_tokens=20,
                 total_tokens=30,
@@ -201,7 +202,8 @@ class FakeProvider(BaseProvider):
 
         # Usage and end
         yield StreamEvent.usage_event(
-            fake_response.usage or Usage(
+            fake_response.usage
+            or Usage(
                 prompt_tokens=10,
                 completion_tokens=20,
                 total_tokens=30,

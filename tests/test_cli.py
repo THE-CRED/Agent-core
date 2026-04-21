@@ -89,15 +89,22 @@ class TestMain:
     def test_run_parser_all_flags(self):
         """Run subcommand correctly parses all flags."""
         with patch("agent.cli.main.cmd_run", return_value=0) as mock_cmd:
-            main([
-                "run", "prompt text",
-                "-p", "anthropic",
-                "-m", "claude-sonnet-4-20250514",
-                "-s", "You are helpful",
-                "-t", "0.7",
-                "--stream",
-                "--json",
-            ])
+            main(
+                [
+                    "run",
+                    "prompt text",
+                    "-p",
+                    "anthropic",
+                    "-m",
+                    "claude-sonnet-4-20250514",
+                    "-s",
+                    "You are helpful",
+                    "-t",
+                    "0.7",
+                    "--stream",
+                    "--json",
+                ]
+            )
         parsed_args = mock_cmd.call_args[0][0]
         assert parsed_args.prompt == "prompt text"
         assert parsed_args.provider == "anthropic"
@@ -148,7 +155,9 @@ class TestCmdRun:
         mock_agent_instance.run.return_value = mock_response
 
         # Patch the import inside cmd_run
-        with patch.dict("sys.modules", {"agent": MagicMock(Agent=MagicMock(return_value=mock_agent_instance))}):
+        with patch.dict(
+            "sys.modules", {"agent": MagicMock(Agent=MagicMock(return_value=mock_agent_instance))}
+        ):
             args = self._make_args()
             result = cmd_run(args)
 
@@ -163,7 +172,9 @@ class TestCmdRun:
         mock_agent = MagicMock()
         mock_agent.run.return_value = mock_response
 
-        with patch.dict("sys.modules", {"agent": MagicMock(Agent=MagicMock(return_value=mock_agent))}):
+        with patch.dict(
+            "sys.modules", {"agent": MagicMock(Agent=MagicMock(return_value=mock_agent))}
+        ):
             args = self._make_args(model="gpt-4o-mini")
             result = cmd_run(args)
 
@@ -317,9 +328,7 @@ class TestCmdRun:
             args = self._make_args(system="Be concise")
             cmd_run(args)
 
-        mock_agent.run.assert_called_once_with(
-            "Say hello", system="Be concise"
-        )
+        mock_agent.run.assert_called_once_with("Say hello", system="Be concise")
 
 
 # ---------------------------------------------------------------------------
@@ -336,11 +345,10 @@ class TestCmdProviders:
         """cmd_providers returns 0 and prints header."""
         mock_registry.list_providers.return_value = []
         # Need to also patch the import inside the function
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry"
-        ) as inner_registry:
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry") as inner_registry,
+        ):
             inner_registry.list_providers.return_value = []
             result = cmd_providers(SimpleNamespace())
 
@@ -363,10 +371,9 @@ class TestCmdProviders:
         mock_registry.list_providers.return_value = ["test_provider"]
         mock_registry.get_class.return_value = mock_provider_cls
 
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry", mock_registry
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry", mock_registry),
         ):
             result = cmd_providers(SimpleNamespace())
 
@@ -384,10 +391,9 @@ class TestCmdProviders:
         mock_registry.list_providers.return_value = ["broken"]
         mock_registry.get_class.side_effect = RuntimeError("bad import")
 
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry", mock_registry
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry", mock_registry),
         ):
             result = cmd_providers(SimpleNamespace())
 
@@ -410,14 +416,11 @@ class TestCmdDoctor:
         mock_registry = MagicMock()
         mock_registry.list_providers.return_value = []
 
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry", mock_registry
-        ), patch(
-            "agent.config.ENV_VARS", {}
-        ), patch.dict(
-            "os.environ", {}, clear=True
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry", mock_registry),
+            patch("agent.config.ENV_VARS", {}),
+            patch.dict("os.environ", {}, clear=True),
         ):
             result = cmd_doctor(SimpleNamespace())
 
@@ -434,14 +437,11 @@ class TestCmdDoctor:
         env_vars = {"openai": "OPENAI_API_KEY"}
         fake_env = {"OPENAI_API_KEY": "sk-1234567890abcdefghijklmn"}
 
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry", mock_registry
-        ), patch(
-            "agent.config.ENV_VARS", env_vars
-        ), patch.dict(
-            "os.environ", fake_env, clear=True
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry", mock_registry),
+            patch("agent.config.ENV_VARS", env_vars),
+            patch.dict("os.environ", fake_env, clear=True),
         ):
             result = cmd_doctor(SimpleNamespace())
 
@@ -460,14 +460,11 @@ class TestCmdDoctor:
 
         env_vars = {"anthropic": "ANTHROPIC_API_KEY"}
 
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry", mock_registry
-        ), patch(
-            "agent.config.ENV_VARS", env_vars
-        ), patch.dict(
-            "os.environ", {}, clear=True
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry", mock_registry),
+            patch("agent.config.ENV_VARS", env_vars),
+            patch.dict("os.environ", {}, clear=True),
         ):
             result = cmd_doctor(SimpleNamespace())
 
@@ -482,14 +479,11 @@ class TestCmdDoctor:
         mock_registry.list_providers.return_value = ["openai"]
         mock_registry.get_class.return_value = MagicMock()
 
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry", mock_registry
-        ), patch(
-            "agent.config.ENV_VARS", {}
-        ), patch.dict(
-            "os.environ", {}, clear=True
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry", mock_registry),
+            patch("agent.config.ENV_VARS", {}),
+            patch.dict("os.environ", {}, clear=True),
         ):
             result = cmd_doctor(SimpleNamespace())
 
@@ -503,14 +497,11 @@ class TestCmdDoctor:
         mock_registry.list_providers.return_value = ["broken"]
         mock_registry.get_class.side_effect = ImportError("no module named x")
 
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry", mock_registry
-        ), patch(
-            "agent.config.ENV_VARS", {}
-        ), patch.dict(
-            "os.environ", {}, clear=True
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry", mock_registry),
+            patch("agent.config.ENV_VARS", {}),
+            patch.dict("os.environ", {}, clear=True),
         ):
             result = cmd_doctor(SimpleNamespace())
 
@@ -524,14 +515,11 @@ class TestCmdDoctor:
         mock_registry.list_providers.return_value = ["bad"]
         mock_registry.get_class.side_effect = RuntimeError("something broke")
 
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry", mock_registry
-        ), patch(
-            "agent.config.ENV_VARS", {}
-        ), patch.dict(
-            "os.environ", {}, clear=True
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry", mock_registry),
+            patch("agent.config.ENV_VARS", {}),
+            patch.dict("os.environ", {}, clear=True),
         ):
             result = cmd_doctor(SimpleNamespace())
 
@@ -547,14 +535,11 @@ class TestCmdDoctor:
 
         env_vars = {"openai": "OPENAI_API_KEY"}
 
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry", mock_registry
-        ), patch(
-            "agent.config.ENV_VARS", env_vars
-        ), patch.dict(
-            "os.environ", {}, clear=True
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry", mock_registry),
+            patch("agent.config.ENV_VARS", env_vars),
+            patch.dict("os.environ", {}, clear=True),
         ):
             result = cmd_doctor(SimpleNamespace())
 
@@ -576,17 +561,15 @@ class TestCmdDoctor:
         mock_agent = MagicMock()
         mock_agent.run.return_value = mock_response
 
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry", mock_registry
-        ), patch(
-            "agent.config.ENV_VARS", env_vars
-        ), patch.dict(
-            "os.environ", fake_env, clear=True
-        ), patch.dict(
-            "sys.modules",
-            {"agent": MagicMock(Agent=MagicMock(return_value=mock_agent))},
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry", mock_registry),
+            patch("agent.config.ENV_VARS", env_vars),
+            patch.dict("os.environ", fake_env, clear=True),
+            patch.dict(
+                "sys.modules",
+                {"agent": MagicMock(Agent=MagicMock(return_value=mock_agent))},
+            ),
         ):
             result = cmd_doctor(SimpleNamespace())
 
@@ -603,17 +586,15 @@ class TestCmdDoctor:
         env_vars = {"openai": "OPENAI_API_KEY"}
         fake_env = {"OPENAI_API_KEY": "sk-testkey1234567890"}
 
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry", mock_registry
-        ), patch(
-            "agent.config.ENV_VARS", env_vars
-        ), patch.dict(
-            "os.environ", fake_env, clear=True
-        ), patch.dict(
-            "sys.modules",
-            {"agent": MagicMock(Agent=MagicMock(side_effect=RuntimeError("conn refused")))},
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry", mock_registry),
+            patch("agent.config.ENV_VARS", env_vars),
+            patch.dict("os.environ", fake_env, clear=True),
+            patch.dict(
+                "sys.modules",
+                {"agent": MagicMock(Agent=MagicMock(side_effect=RuntimeError("conn refused")))},
+            ),
         ):
             result = cmd_doctor(SimpleNamespace())
 
@@ -629,14 +610,11 @@ class TestCmdDoctor:
         env_vars = {"openai": "OPENAI_API_KEY"}
         fake_env = {"OPENAI_API_KEY": "short"}
 
-        with patch(
-            "agent.providers.registry._ensure_providers_loaded"
-        ), patch(
-            "agent.providers.registry.ProviderRegistry", mock_registry
-        ), patch(
-            "agent.config.ENV_VARS", env_vars
-        ), patch.dict(
-            "os.environ", fake_env, clear=True
+        with (
+            patch("agent.providers.registry._ensure_providers_loaded"),
+            patch("agent.providers.registry.ProviderRegistry", mock_registry),
+            patch("agent.config.ENV_VARS", env_vars),
+            patch.dict("os.environ", fake_env, clear=True),
         ):
             result = cmd_doctor(SimpleNamespace())
 

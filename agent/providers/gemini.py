@@ -29,6 +29,7 @@ try:
         GenerationConfig,
         Part,
     )
+
     HAS_GEMINI = True
 except ImportError:
     HAS_GEMINI = False
@@ -195,10 +196,12 @@ class GeminiProvider(BaseProvider):
         if isinstance(msg.content, str):
             if msg.role == "tool":
                 # Tool results need special handling
-                parts.append(Part.from_function_response(
-                    name=msg.name or "tool",
-                    response={"result": msg.content},
-                ))
+                parts.append(
+                    Part.from_function_response(
+                        name=msg.name or "tool",
+                        response={"result": msg.content},
+                    )
+                )
             else:
                 parts.append(Part.from_text(msg.content))
         else:
@@ -206,24 +209,30 @@ class GeminiProvider(BaseProvider):
                 if part.type == "text" and part.text:
                     parts.append(Part.from_text(part.text))
                 elif part.type == "image" and part.image_data:
-                    parts.append(Part.from_data(
-                        data=part.image_data,
-                        mime_type=part.media_type or "image/png",
-                    ))
+                    parts.append(
+                        Part.from_data(
+                            data=part.image_data,
+                            mime_type=part.media_type or "image/png",
+                        )
+                    )
                 elif part.type == "image_url" and part.image_url:
                     # Gemini prefers inline data, but we can try URL
-                    parts.append(Part.from_uri(
-                        uri=part.image_url,
-                        mime_type="image/jpeg",
-                    ))
+                    parts.append(
+                        Part.from_uri(
+                            uri=part.image_url,
+                            mime_type="image/jpeg",
+                        )
+                    )
 
         # Handle tool calls in assistant messages
         if msg.role == "assistant" and msg.tool_calls:
             for tc in msg.tool_calls:
-                parts.append(Part.from_function_call(
-                    name=tc["name"],
-                    args=tc.get("arguments", {}),
-                ))
+                parts.append(
+                    Part.from_function_call(
+                        name=tc["name"],
+                        args=tc.get("arguments", {}),
+                    )
+                )
 
         return Content(role=role, parts=parts)
 

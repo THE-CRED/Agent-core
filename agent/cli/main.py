@@ -27,20 +27,24 @@ def main(args: list[str] | None = None) -> int:
     run_parser = subparsers.add_parser("run", help="Run a single prompt")
     run_parser.add_argument("prompt", help="The prompt to send")
     run_parser.add_argument(
-        "-p", "--provider",
+        "-p",
+        "--provider",
         default="openai",
         help="Provider to use (default: openai)",
     )
     run_parser.add_argument(
-        "-m", "--model",
+        "-m",
+        "--model",
         help="Model to use (default: provider default)",
     )
     run_parser.add_argument(
-        "-s", "--system",
+        "-s",
+        "--system",
         help="System prompt",
     )
     run_parser.add_argument(
-        "-t", "--temperature",
+        "-t",
+        "--temperature",
         type=float,
         help="Sampling temperature",
     )
@@ -58,16 +62,19 @@ def main(args: list[str] | None = None) -> int:
     # Chat command
     chat_parser = subparsers.add_parser("chat", help="Start an interactive chat session")
     chat_parser.add_argument(
-        "-p", "--provider",
+        "-p",
+        "--provider",
         default="openai",
         help="Provider to use (default: openai)",
     )
     chat_parser.add_argument(
-        "-m", "--model",
+        "-m",
+        "--model",
         help="Model to use",
     )
     chat_parser.add_argument(
-        "-s", "--system",
+        "-s",
+        "--system",
         help="System prompt",
     )
 

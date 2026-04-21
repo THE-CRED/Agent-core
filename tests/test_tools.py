@@ -1,6 +1,5 @@
 """Tests for the tool system."""
 
-
 from agent import Tool, ToolCall, ToolSpec, tool
 from agent.tools import ToolRegistry, _extract_schema_from_function
 
@@ -10,6 +9,7 @@ class TestToolDecorator:
 
     def test_basic_tool_creation(self):
         """Test creating a basic tool."""
+
         @tool
         def greet(name: str) -> str:
             """Say hello to someone."""
@@ -21,6 +21,7 @@ class TestToolDecorator:
 
     def test_tool_with_custom_name(self):
         """Test tool with custom name."""
+
         @tool(name="custom_greeting")
         def greet(name: str) -> str:
             """Greet a person."""
@@ -30,6 +31,7 @@ class TestToolDecorator:
 
     def test_tool_with_custom_description(self):
         """Test tool with custom description."""
+
         @tool(description="A custom description")
         def my_func() -> str:
             """Original docstring."""
@@ -39,6 +41,7 @@ class TestToolDecorator:
 
     def test_tool_schema_extraction(self):
         """Test that schema is extracted from type hints."""
+
         @tool
         def search(query: str, limit: int = 10) -> str:
             """Search for items."""
@@ -53,6 +56,7 @@ class TestToolDecorator:
 
     def test_tool_execution_sync(self):
         """Test synchronous tool execution."""
+
         @tool
         def add(a: int, b: int) -> str:
             """Add two numbers."""
@@ -63,6 +67,7 @@ class TestToolDecorator:
 
     def test_async_tool(self):
         """Test async tool detection."""
+
         @tool
         async def async_fetch(url: str) -> str:
             """Fetch a URL."""
@@ -76,6 +81,7 @@ class TestSchemaExtraction:
 
     def test_basic_types(self):
         """Test extraction of basic types."""
+
         def func(s: str, i: int, f: float, b: bool) -> str:
             return ""
 
@@ -89,6 +95,7 @@ class TestSchemaExtraction:
 
     def test_list_type(self):
         """Test extraction of list types."""
+
         def func(items: list[str]) -> str:
             return ""
 
@@ -100,6 +107,7 @@ class TestSchemaExtraction:
 
     def test_required_vs_optional(self):
         """Test required vs optional parameters."""
+
         def func(required: str, optional: str = "default") -> str:
             return ""
 

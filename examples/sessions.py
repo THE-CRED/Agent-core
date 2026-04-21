@@ -10,6 +10,7 @@ from agent import Agent
 # Basic Session
 # ============================================================================
 
+
 def basic_session():
     """Simple multi-turn conversation."""
     agent = Agent(
@@ -35,6 +36,7 @@ def basic_session():
 # Session with System Prompt
 # ============================================================================
 
+
 def session_with_system():
     """Session with a custom system prompt."""
     agent = Agent(
@@ -56,6 +58,7 @@ def session_with_system():
 # ============================================================================
 # Forking Sessions
 # ============================================================================
+
 
 def forking_sessions():
     """Create session branches."""
@@ -90,6 +93,7 @@ def forking_sessions():
 # Session Serialization
 # ============================================================================
 
+
 def session_serialization():
     """Save and restore sessions."""
     agent = Agent(
@@ -108,6 +112,7 @@ def session_serialization():
 
     # Later: restore session
     from agent.session import Session
+
     restored = Session.from_dict(session_data, agent)
 
     # Continue the conversation
@@ -118,6 +123,7 @@ def session_serialization():
 # ============================================================================
 # Streaming in Sessions
 # ============================================================================
+
 
 def streaming_session():
     """Stream responses in a session."""
@@ -149,6 +155,7 @@ def streaming_session():
 # Interactive Chat Loop
 # ============================================================================
 
+
 def interactive_chat():
     """Simple interactive chat loop."""
     agent = Agent(
@@ -156,9 +163,7 @@ def interactive_chat():
         model="gpt-4o",
     )
 
-    session = agent.session(
-        system="You are a helpful assistant. Be concise."
-    )
+    session = agent.session(system="You are a helpful assistant. Be concise.")
 
     print("Chat started. Type 'quit' to exit, 'clear' to clear history.")
     print("-" * 50)

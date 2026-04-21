@@ -10,6 +10,7 @@ from agent import Agent
 # Basic Text Generation
 # ============================================================================
 
+
 def basic_generation():
     """Simple text generation with default settings."""
     agent = Agent(
@@ -26,6 +27,7 @@ def basic_generation():
 # With System Prompt
 # ============================================================================
 
+
 def with_system_prompt():
     """Using a system prompt to set behavior."""
     agent = Agent(
@@ -41,6 +43,7 @@ def with_system_prompt():
 # ============================================================================
 # Streaming Response
 # ============================================================================
+
 
 def streaming_response():
     """Stream responses for real-time output."""
@@ -59,6 +62,7 @@ def streaming_response():
 # ============================================================================
 # Provider Switching
 # ============================================================================
+
 
 def provider_switching():
     """Same code, different providers."""
@@ -82,6 +86,7 @@ def provider_switching():
 # Temperature Control
 # ============================================================================
 
+
 def temperature_control():
     """Control randomness with temperature."""
     agent = Agent(
@@ -103,6 +108,7 @@ def temperature_control():
 # ============================================================================
 # Using with_config for Variations
 # ============================================================================
+
 
 def config_variations():
     """Create agent variations with with_config."""

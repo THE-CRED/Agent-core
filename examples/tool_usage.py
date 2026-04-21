@@ -14,6 +14,7 @@ from agent import Agent, tool
 # Basic Tool
 # ============================================================================
 
+
 @tool
 def get_weather(city: str) -> str:
     """Get the current weather for a city."""
@@ -43,6 +44,7 @@ def basic_tool_usage():
 # ============================================================================
 # Calculator Tool
 # ============================================================================
+
 
 @tool
 def calculate(expression: str) -> str:
@@ -99,6 +101,7 @@ def calculator_example():
 # Multiple Tools
 # ============================================================================
 
+
 @tool
 def search_database(query: str) -> str:
     """Search the product database."""
@@ -149,6 +152,7 @@ def multi_tool_example():
 # Async Tool
 # ============================================================================
 
+
 @tool
 async def fetch_url(url: str) -> str:
     """Fetch content from a URL (simulated)."""
@@ -171,6 +175,7 @@ async def async_tool_example():
 # ============================================================================
 # Tool with Complex Types
 # ============================================================================
+
 
 class SearchFilters(BaseModel):
     category: str

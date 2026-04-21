@@ -325,7 +325,9 @@ class Session:
             "messages": [
                 {
                     "role": m.role,
-                    "content": m.content if isinstance(m.content, str) else [
+                    "content": m.content
+                    if isinstance(m.content, str)
+                    else [
                         {"type": p.type, "text": p.text, "image_url": p.image_url}
                         for p in m.content
                     ],

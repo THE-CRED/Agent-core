@@ -28,6 +28,7 @@ from agent.types.tools import ToolCall
 try:
     import anthropic
     from anthropic import Anthropic, AsyncAnthropic
+
     HAS_ANTHROPIC = True
 except ImportError:
     HAS_ANTHROPIC = False
@@ -256,24 +257,28 @@ class AnthropicProvider(BaseProvider):
                     parts.append({"type": "text", "text": part.text})
                 elif part.type == "image_url" and part.image_url:
                     # Anthropic needs base64 for images
-                    parts.append({
-                        "type": "image",
-                        "source": {
-                            "type": "url",
-                            "url": part.image_url,
-                        },
-                    })
+                    parts.append(
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "url",
+                                "url": part.image_url,
+                            },
+                        }
+                    )
                 elif part.type == "image" and part.image_data:
                     b64_data = base64.b64encode(part.image_data).decode()
                     media_type = part.media_type or "image/png"
-                    parts.append({
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": media_type,
-                            "data": b64_data,
-                        },
-                    })
+                    parts.append(
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": media_type,
+                                "data": b64_data,
+                            },
+                        }
+                    )
             result["content"] = parts
 
         # Handle assistant messages with tool calls
@@ -282,12 +287,14 @@ class AnthropicProvider(BaseProvider):
             if msg.content and isinstance(msg.content, str):
                 content.append({"type": "text", "text": msg.content})
             for tc in msg.tool_calls:
-                content.append({
-                    "type": "tool_use",
-                    "id": tc["id"],
-                    "name": tc["name"],
-                    "input": tc.get("arguments", {}),
-                })
+                content.append(
+                    {
+                        "type": "tool_use",
+                        "id": tc["id"],
+                        "name": tc["name"],
+                        "input": tc.get("arguments", {}),
+                    }
+                )
             result["content"] = content
 
         return result

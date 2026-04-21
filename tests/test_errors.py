@@ -174,17 +174,27 @@ class TestInheritanceHierarchy:
 
     def test_all_are_agent_errors(self):
         for cls in [
-            AuthenticationError, ProviderError, RateLimitError,
-            TimeoutError, ToolExecutionError, SchemaValidationError,
-            UnsupportedFeatureError, RoutingError,
+            AuthenticationError,
+            ProviderError,
+            RateLimitError,
+            TimeoutError,
+            ToolExecutionError,
+            SchemaValidationError,
+            UnsupportedFeatureError,
+            RoutingError,
         ]:
             assert issubclass(cls, AgentError)
 
     def test_catch_agent_error_catches_all(self):
         for cls in [
-            AuthenticationError, ProviderError, RateLimitError,
-            TimeoutError, ToolExecutionError, SchemaValidationError,
-            UnsupportedFeatureError, RoutingError,
+            AuthenticationError,
+            ProviderError,
+            RateLimitError,
+            TimeoutError,
+            ToolExecutionError,
+            SchemaValidationError,
+            UnsupportedFeatureError,
+            RoutingError,
         ]:
             with pytest.raises(AgentError):
                 raise cls("test")
@@ -192,4 +202,5 @@ class TestInheritanceHierarchy:
 
 def builtins_timeout():
     import builtins
+
     return builtins.TimeoutError
