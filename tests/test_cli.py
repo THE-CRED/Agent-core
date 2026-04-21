@@ -1,11 +1,16 @@
 """Tests for agent.cli.main module."""
 
+import sys
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from agent.cli.main import cmd_doctor, cmd_providers, cmd_run, main
+
+# agent.cli.main resolves to the function main() because agent.cli.__init__
+# re-exports it. We need the actual module object for patch.object().
+cli_module = sys.modules["agent.cli.main"]
 
 # ---------------------------------------------------------------------------
 # main() entry point
@@ -43,7 +48,7 @@ class TestMain:
 
     def test_run_subcommand_dispatches_to_cmd_run(self):
         """main(['run', ...]) calls cmd_run and returns its result."""
-        with patch("agent.cli.main.cmd_run", return_value=0) as mock_cmd:
+        with patch.object(cli_module, "cmd_run", return_value=0) as mock_cmd:
             result = main(["run", "hello", "-p", "openai"])
         assert result == 0
         mock_cmd.assert_called_once()
@@ -53,7 +58,7 @@ class TestMain:
 
     def test_chat_subcommand_dispatches_to_cmd_chat(self):
         """main(['chat', ...]) calls cmd_chat and returns its result."""
-        with patch("agent.cli.main.cmd_chat", return_value=0) as mock_cmd:
+        with patch.object(cli_module, "cmd_chat", return_value=0) as mock_cmd:
             result = main(["chat", "-p", "anthropic"])
         assert result == 0
         mock_cmd.assert_called_once()
@@ -62,21 +67,21 @@ class TestMain:
 
     def test_providers_subcommand_dispatches_to_cmd_providers(self):
         """main(['providers']) calls cmd_providers and returns its result."""
-        with patch("agent.cli.main.cmd_providers", return_value=0) as mock_cmd:
+        with patch.object(cli_module, "cmd_providers", return_value=0) as mock_cmd:
             result = main(["providers"])
         assert result == 0
         mock_cmd.assert_called_once()
 
     def test_doctor_subcommand_dispatches_to_cmd_doctor(self):
         """main(['doctor']) calls cmd_doctor and returns its result."""
-        with patch("agent.cli.main.cmd_doctor", return_value=0) as mock_cmd:
+        with patch.object(cli_module, "cmd_doctor", return_value=0) as mock_cmd:
             result = main(["doctor"])
         assert result == 0
         mock_cmd.assert_called_once()
 
     def test_run_parser_defaults(self):
         """Run subcommand has correct default values for optional args."""
-        with patch("agent.cli.main.cmd_run", return_value=0) as mock_cmd:
+        with patch.object(cli_module, "cmd_run", return_value=0) as mock_cmd:
             main(["run", "test prompt"])
         parsed_args = mock_cmd.call_args[0][0]
         assert parsed_args.provider == "openai"
@@ -88,7 +93,7 @@ class TestMain:
 
     def test_run_parser_all_flags(self):
         """Run subcommand correctly parses all flags."""
-        with patch("agent.cli.main.cmd_run", return_value=0) as mock_cmd:
+        with patch.object(cli_module, "cmd_run", return_value=0) as mock_cmd:
             main(
                 [
                     "run",
@@ -116,7 +121,7 @@ class TestMain:
 
     def test_chat_parser_defaults(self):
         """Chat subcommand has correct default values."""
-        with patch("agent.cli.main.cmd_chat", return_value=0) as mock_cmd:
+        with patch.object(cli_module, "cmd_chat", return_value=0) as mock_cmd:
             main(["chat"])
         parsed_args = mock_cmd.call_args[0][0]
         assert parsed_args.provider == "openai"
@@ -145,7 +150,7 @@ class TestCmdRun:
         defaults.update(overrides)
         return SimpleNamespace(**defaults)
 
-    @patch("agent.cli.main.Agent", create=True)
+    @patch.object(cli_module, "Agent", create=True)
     def test_run_normal_response(self, mock_agent_cls, capsys):
         """cmd_run prints response text for non-streaming call."""
         mock_response = MagicMock()
@@ -163,7 +168,7 @@ class TestCmdRun:
 
         assert result == 0
 
-    @patch("agent.cli.main.Agent", create=True)
+    @patch.object(cli_module, "Agent", create=True)
     def test_run_with_explicit_model(self, mock_agent_cls, capsys):
         """cmd_run uses explicit model when provided."""
         mock_response = MagicMock()
@@ -339,8 +344,8 @@ class TestCmdRun:
 class TestCmdProviders:
     """Tests for cmd_providers."""
 
-    @patch("agent.cli.main._ensure_providers_loaded", create=True)
-    @patch("agent.cli.main.ProviderRegistry", create=True)
+    @patch.object(cli_module, "_ensure_providers_loaded", create=True)
+    @patch.object(cli_module, "ProviderRegistry", create=True)
     def test_providers_returns_zero(self, mock_registry, mock_ensure, capsys):
         """cmd_providers returns 0 and prints header."""
         mock_registry.list_providers.return_value = []
