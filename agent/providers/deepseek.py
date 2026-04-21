@@ -5,7 +5,7 @@ Uses OpenAI-compatible API.
 """
 
 from collections.abc import AsyncIterator, Iterator
-from typing import Any
+from typing import Any  # noqa: F811
 
 from agent.messages import AgentRequest
 from agent.providers.base import BaseProvider
@@ -19,7 +19,7 @@ try:
     from agent.providers.openai import HAS_OPENAI, OpenAIProvider
 except ImportError:
     HAS_OPENAI = False
-    OpenAIProvider = None  # type: ignore
+    OpenAIProvider: Any = None
 
 
 class DeepSeekProvider(BaseProvider):
@@ -66,6 +66,7 @@ class DeepSeekProvider(BaseProvider):
         )
 
         # Use OpenAI provider with DeepSeek endpoint
+        assert OpenAIProvider is not None
         self._openai_provider = OpenAIProvider(
             api_key=api_key,
             base_url=base_url or self.DEEPSEEK_BASE_URL,

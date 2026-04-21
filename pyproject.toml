@@ -10,7 +10,8 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
 authors = [
-    { name = "Shlok Mundhra" }
+    { name = "Shlok Mundhra" },
+    { name = "Glock" }
 ]
 keywords = [
     "llm",
@@ -80,6 +81,17 @@ python_version = "3.10"
 strict = true
 warn_return_any = true
 warn_unused_ignores = true
+
+[tool.ty.environment]
+python-version = "3.12"
+
+[tool.ty.rules]
+# Third-party SDK calls use **kwargs which ty can't match against strict overloads
+no-matching-overload = "warn"
+# Third-party SDK types have union variants that are handled at runtime
+invalid-argument-type = "warn"
+# Third-party SDK union types where we know the concrete type at runtime
+unresolved-attribute = "warn"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

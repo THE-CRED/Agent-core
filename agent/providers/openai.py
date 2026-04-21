@@ -34,8 +34,8 @@ try:
     HAS_OPENAI = True
 except ImportError:
     HAS_OPENAI = False
-    OpenAI = None  # type: ignore
-    AsyncOpenAI = None  # type: ignore
+    OpenAI: Any = None
+    AsyncOpenAI: Any = None
 
 
 class OpenAIProvider(BaseProvider):
@@ -79,6 +79,8 @@ class OpenAIProvider(BaseProvider):
             **kwargs,
         )
 
+        assert OpenAI is not None
+        assert AsyncOpenAI is not None
         self._client = OpenAI(
             api_key=api_key,
             base_url=base_url,
@@ -98,7 +100,7 @@ class OpenAIProvider(BaseProvider):
             messages = self._convert_messages(request)
             kwargs = self._build_kwargs(request)
 
-            response = self._client.chat.completions.create(
+            response = self._client.chat.completions.create(  # type: ignore[no-matching-overload]
                 messages=messages,
                 **kwargs,
             )
@@ -130,7 +132,7 @@ class OpenAIProvider(BaseProvider):
             messages = self._convert_messages(request)
             kwargs = self._build_kwargs(request)
 
-            response = await self._async_client.chat.completions.create(
+            response = await self._async_client.chat.completions.create(  # type: ignore[no-matching-overload]
                 messages=messages,
                 **kwargs,
             )
@@ -164,7 +166,7 @@ class OpenAIProvider(BaseProvider):
             kwargs["stream"] = True
             kwargs["stream_options"] = {"include_usage": True}
 
-            response = self._client.chat.completions.create(
+            response = self._client.chat.completions.create(  # type: ignore[no-matching-overload]
                 messages=messages,
                 **kwargs,
             )
@@ -198,7 +200,7 @@ class OpenAIProvider(BaseProvider):
             kwargs["stream"] = True
             kwargs["stream_options"] = {"include_usage": True}
 
-            response = await self._async_client.chat.completions.create(
+            response = await self._async_client.chat.completions.create(  # type: ignore[no-matching-overload]
                 messages=messages,
                 **kwargs,
             )
@@ -348,9 +350,9 @@ class OpenAIProvider(BaseProvider):
                 tool_calls.append(
                     ToolCall(
                         id=tc.id,
-                        name=tc.function.name,
-                        arguments=json.loads(tc.function.arguments)
-                        if tc.function.arguments
+                        name=tc.function.name,  # type: ignore[union-attr]
+                        arguments=json.loads(tc.function.arguments)  # type: ignore[union-attr]
+                        if tc.function.arguments  # type: ignore[union-attr]
                         else {},
                     )
                 )
@@ -428,7 +430,7 @@ class OpenAIProvider(BaseProvider):
                         yield StreamEvent.tool_call_start(
                             ToolCall(
                                 id=tc_delta.id,
-                                name=tc_delta.function.name if tc_delta.function else "",
+                                name=tc_delta.function.name if tc_delta.function else "",  # type: ignore[union-attr]
                                 arguments={},
                             ),
                             raw=chunk,

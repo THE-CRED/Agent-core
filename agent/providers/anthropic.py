@@ -32,8 +32,8 @@ try:
     HAS_ANTHROPIC = True
 except ImportError:
     HAS_ANTHROPIC = False
-    Anthropic = None  # type: ignore
-    AsyncAnthropic = None  # type: ignore
+    Anthropic: Any = None
+    AsyncAnthropic: Any = None
 
 
 class AnthropicProvider(BaseProvider):
@@ -84,6 +84,8 @@ class AnthropicProvider(BaseProvider):
         if base_url:
             client_kwargs["base_url"] = base_url
 
+        assert Anthropic is not None
+        assert AsyncAnthropic is not None
         self._client = Anthropic(**client_kwargs)
         self._async_client = AsyncAnthropic(**client_kwargs)
 
@@ -93,7 +95,7 @@ class AnthropicProvider(BaseProvider):
             messages = self._convert_messages(request)
             kwargs = self._build_kwargs(request)
 
-            response = self._client.messages.create(
+            response = self._client.messages.create(  # type: ignore[no-matching-overload]
                 messages=messages,
                 **kwargs,
             )
@@ -125,7 +127,7 @@ class AnthropicProvider(BaseProvider):
             messages = self._convert_messages(request)
             kwargs = self._build_kwargs(request)
 
-            response = await self._async_client.messages.create(
+            response = await self._async_client.messages.create(  # type: ignore[no-matching-overload]
                 messages=messages,
                 **kwargs,
             )
@@ -157,7 +159,7 @@ class AnthropicProvider(BaseProvider):
             messages = self._convert_messages(request)
             kwargs = self._build_kwargs(request)
 
-            with self._client.messages.stream(
+            with self._client.messages.stream(  # type: ignore[arg-type]
                 messages=messages,
                 **kwargs,
             ) as stream:
@@ -188,7 +190,7 @@ class AnthropicProvider(BaseProvider):
             messages = self._convert_messages(request)
             kwargs = self._build_kwargs(request)
 
-            async with self._async_client.messages.stream(
+            async with self._async_client.messages.stream(  # type: ignore[arg-type]
                 messages=messages,
                 **kwargs,
             ) as stream:

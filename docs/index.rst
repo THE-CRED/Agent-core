@@ -33,6 +33,14 @@ A clean Python runtime for multi-provider LLM apps and agent workflows.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Reference
+   :caption: API Reference
 
-   api-reference
+   api/agent
+   api/providers
+   api/tools
+   api/middleware
+   api/session
+   api/router
+   api/streaming
+   api/errors
+   api/types

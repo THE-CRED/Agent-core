@@ -78,7 +78,7 @@ class Tool:
             return f"Error: {e}"
 
 
-def _get_json_schema_type(python_type: type) -> dict[str, Any]:
+def _get_json_schema_type(python_type: Any) -> dict[str, Any]:
     """Convert Python type to JSON Schema type."""
     origin = getattr(python_type, "__origin__", None)
 
@@ -87,7 +87,7 @@ def _get_json_schema_type(python_type: type) -> dict[str, Any]:
         return {"type": "null"}
 
     # Handle basic types
-    type_map = {
+    type_map: dict[Any, dict[str, str]] = {
         str: {"type": "string"},
         int: {"type": "integer"},
         float: {"type": "number"},
@@ -123,7 +123,7 @@ def _get_json_schema_type(python_type: type) -> dict[str, Any]:
 
     # Handle Pydantic models
     if hasattr(python_type, "model_json_schema"):
-        return python_type.model_json_schema()
+        return python_type.model_json_schema()  # type: ignore[union-attr]
 
     # Handle Literal
     if origin is type(None):  # Literal
@@ -170,7 +170,7 @@ def _extract_description(func: Callable[..., Any]) -> str:
     """Extract description from function docstring."""
     doc = inspect.getdoc(func)
     if not doc:
-        return f"Execute the {func.__name__} function."
+        return f"Execute the {getattr(func, '__name__', 'unknown')} function."
 
     # Get first line/paragraph of docstring
     lines = doc.strip().split("\n\n")
@@ -201,7 +201,7 @@ def tool(
     """
 
     def decorator(f: Callable[..., Any]) -> Tool:
-        tool_name = name or f.__name__
+        tool_name = name or getattr(f, "__name__", "unknown")
         tool_description = description or _extract_description(f)
         parameters = _extract_schema_from_function(f)
         is_async = asyncio.iscoroutinefunction(f)

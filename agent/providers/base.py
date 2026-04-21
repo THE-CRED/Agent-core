@@ -79,9 +79,12 @@ class BaseProvider(ABC):
         ...
 
     @abstractmethod
-    async def stream_async(self, request: AgentRequest) -> AsyncIterator[StreamEvent]:
+    def stream_async(self, request: AgentRequest) -> AsyncIterator[StreamEvent]:
         """
         Execute an asynchronous streaming request.
+
+        Subclasses implement this as an async generator (``async def`` with ``yield``).
+        Callers should iterate with ``async for``, not ``await``.
 
         Args:
             request: Normalized agent request

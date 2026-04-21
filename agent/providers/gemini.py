@@ -3,7 +3,7 @@ Google Gemini provider adapter.
 """
 
 from collections.abc import AsyncIterator, Iterator
-from typing import Any
+from typing import Any, NoReturn
 
 from agent.errors import (
     AuthenticationError,
@@ -25,15 +25,15 @@ from agent.types.tools import ToolCall
 try:
     import google.generativeai as genai
     from google.generativeai.types import (
-        Content,
+        Content,  # ty: ignore[unresolved-import]
         GenerationConfig,
-        Part,
+        Part,  # ty: ignore[unresolved-import]
     )
 
     HAS_GEMINI = True
 except ImportError:
     HAS_GEMINI = False
-    genai = None  # type: ignore
+    genai: Any = None
 
 
 class GeminiProvider(BaseProvider):
@@ -78,7 +78,9 @@ class GeminiProvider(BaseProvider):
         )
 
         # Configure the SDK
-        genai.configure(api_key=api_key)
+        assert genai is not None
+        self._genai = genai
+        self._genai.configure(api_key=api_key)
 
         # Store model name for later
         self._model_name = kwargs.get("model", "gemini-1.5-pro")
@@ -100,7 +102,7 @@ class GeminiProvider(BaseProvider):
         if request.tools:
             tools = [self._convert_tool(t) for t in request.tools]
 
-        return genai.GenerativeModel(
+        return self._genai.GenerativeModel(
             model_name=model_name,
             generation_config=generation_config,
             tools=tools,
@@ -239,13 +241,13 @@ class GeminiProvider(BaseProvider):
     def _convert_tool(self, tool_spec: Any) -> Any:
         """Convert tool spec to Gemini format."""
         schema = tool_spec.to_gemini_schema()
-        return genai.protos.Tool(
+        return self._genai.protos.Tool(
             function_declarations=[
-                genai.protos.FunctionDeclaration(
+                self._genai.protos.FunctionDeclaration(
                     name=schema["name"],
                     description=schema["description"],
-                    parameters=genai.protos.Schema(
-                        type=genai.protos.Type.OBJECT,
+                    parameters=self._genai.protos.Schema(
+                        type=self._genai.protos.Type.OBJECT,
                         properties={
                             k: self._convert_schema_property(v)
                             for k, v in schema["parameters"].get("properties", {}).items()
@@ -259,17 +261,17 @@ class GeminiProvider(BaseProvider):
     def _convert_schema_property(self, prop: dict[str, Any]) -> Any:
         """Convert a JSON Schema property to Gemini format."""
         type_map = {
-            "string": genai.protos.Type.STRING,
-            "integer": genai.protos.Type.INTEGER,
-            "number": genai.protos.Type.NUMBER,
-            "boolean": genai.protos.Type.BOOLEAN,
-            "array": genai.protos.Type.ARRAY,
-            "object": genai.protos.Type.OBJECT,
+            "string": self._genai.protos.Type.STRING,
+            "integer": self._genai.protos.Type.INTEGER,
+            "number": self._genai.protos.Type.NUMBER,
+            "boolean": self._genai.protos.Type.BOOLEAN,
+            "array": self._genai.protos.Type.ARRAY,
+            "object": self._genai.protos.Type.OBJECT,
         }
 
-        schema_type = type_map.get(prop.get("type", "string"), genai.protos.Type.STRING)
+        schema_type = type_map.get(prop.get("type", "string"), self._genai.protos.Type.STRING)
 
-        return genai.protos.Schema(
+        return self._genai.protos.Schema(
             type=schema_type,
             description=prop.get("description", ""),
         )
@@ -341,7 +343,7 @@ class GeminiProvider(BaseProvider):
                         raw=chunk,
                     )
 
-    def _handle_error(self, e: Exception) -> None:
+    def _handle_error(self, e: Exception) -> NoReturn:
         """Convert Gemini errors to Agent errors."""
         error_str = str(e).lower()
 

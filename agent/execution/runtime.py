@@ -100,10 +100,11 @@ class ExecutionRuntime:
                 request.tools = [t.spec for t in self.tools]
 
             # Execute with retries
-            if self.tool_loop and self.tools:
+            tool_loop = self.tool_loop
+            if tool_loop and self.tools:
                 # Run tool loop
                 response = self.retry_handler.execute(
-                    lambda: self.tool_loop.run_loop(request, self.provider.run)
+                    lambda: tool_loop.run_loop(request, self.provider.run)
                 )
             else:
                 # Simple execution
@@ -184,9 +185,10 @@ class ExecutionRuntime:
                     )
                 request.tools = [t.spec for t in self.tools]
 
-            if self.tool_loop and self.tools:
+            tool_loop = self.tool_loop
+            if tool_loop and self.tools:
                 response = await self.retry_handler.execute_async(
-                    lambda: self.tool_loop.run_loop_async(request, self.provider.run_async)
+                    lambda: tool_loop.run_loop_async(request, self.provider.run_async)
                 )
             else:
                 response = await self.retry_handler.execute_async(
