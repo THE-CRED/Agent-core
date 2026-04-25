@@ -205,8 +205,9 @@ class OpenAIProvider(BaseProvider):
                 **kwargs,
             )
 
+            current_tool_calls: dict[int, dict[str, Any]] = {}
             async for chunk in response:
-                for event in self._convert_chunk(chunk):
+                for event in self._convert_chunk(chunk, current_tool_calls):
                     yield event
 
         except openai.AuthenticationError as e:

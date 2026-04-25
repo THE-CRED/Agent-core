@@ -532,14 +532,14 @@ class TestFakeProviderRun:
         assert resp.usage is not None
         assert resp.usage.prompt_tokens == 10
         assert resp.usage.completion_tokens == 20
-        assert resp.usage.total_tokens == 30
+        assert resp.usage is not None and resp.usage.total_tokens == 30
 
     def test_run_custom_usage(self):
         p = FakeProvider()
         usage = Usage(prompt_tokens=100, completion_tokens=200, total_tokens=300)
         p.set_response(FakeResponse(text="x", usage=usage))
         resp = p.run(_make_request())
-        assert resp.usage.total_tokens == 300
+        assert resp.usage is not None and resp.usage.total_tokens == 300
 
     def test_run_with_tool_calls(self):
         p = FakeProvider()
@@ -561,7 +561,8 @@ class TestFakeProviderRun:
         with pytest.raises(RuntimeError):
             p.run(_make_request("tracked"))
         assert len(p.get_requests()) == 1
-        assert p.get_last_request().input == "tracked"
+        last_req = p.get_last_request()
+        assert last_req is not None and last_req.input == "tracked"
 
     def test_run_content_field(self):
         p = FakeProvider()
@@ -649,7 +650,7 @@ class TestFakeProviderStream:
         events = list(p.stream(_make_request()))
         tc_events = [e for e in events if e.type == "tool_call_start"]
         assert len(tc_events) == 1
-        assert tc_events[0].tool_call.name == "fn"
+        assert tc_events[0].tool_call is not None and tc_events[0].tool_call.name == "fn"
 
     def test_stream_usage_event(self):
         p = FakeProvider()
@@ -657,7 +658,7 @@ class TestFakeProviderStream:
         events = list(p.stream(_make_request()))
         usage_events = [e for e in events if e.type == "usage"]
         assert len(usage_events) == 1
-        assert usage_events[0].usage.total_tokens == 30
+        assert usage_events[0].usage is not None and usage_events[0].usage.total_tokens == 30
 
     def test_stream_message_end(self):
         p = FakeProvider()
@@ -689,7 +690,7 @@ class TestFakeProviderStream:
         p.set_response(FakeResponse(text="x", usage=usage))
         events = list(p.stream(_make_request()))
         usage_events = [e for e in events if e.type == "usage"]
-        assert usage_events[0].usage.total_tokens == 15
+        assert usage_events[0].usage is not None and usage_events[0].usage.total_tokens == 15
 
 
 class TestFakeProviderStreamAsync:
@@ -762,7 +763,7 @@ class TestCreateTestResponse:
         assert resp.stop_reason == "stop"
         assert resp.latency_ms == 100.0
         assert resp.usage is not None
-        assert resp.usage.total_tokens == 30
+        assert resp.usage is not None and resp.usage.total_tokens == 30
         assert resp.tool_calls == []
         assert resp.raw == {"test": True}
 
@@ -773,7 +774,7 @@ class TestCreateTestResponse:
     def test_custom_usage(self):
         u = Usage(prompt_tokens=1, completion_tokens=2, total_tokens=3)
         resp = create_test_response(usage=u)
-        assert resp.usage.total_tokens == 3
+        assert resp.usage is not None and resp.usage.total_tokens == 3
 
     def test_custom_tool_calls(self):
         tc = [ToolCall(id="c1", name="fn", arguments={"x": 1})]

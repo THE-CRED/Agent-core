@@ -32,7 +32,9 @@ class StreamResponse:
         self._done: bool = False
 
     def __iter__(self) -> Iterator[StreamEvent]:
-        """Iterate over stream events."""
+        """Iterate over stream events. Can only be iterated once."""
+        if self._done:
+            return
         for event in self._events:
             # Accumulate text
             if event.type == "text_delta" and event.text:

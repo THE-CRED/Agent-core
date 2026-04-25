@@ -4,10 +4,13 @@ Provider registry.
 Manages registration and instantiation of provider adapters.
 """
 
+import threading
 from typing import Any
 
 from agent.errors import ProviderError
 from agent.providers.base import BaseProvider
+
+_registry_lock = threading.Lock()
 
 
 class ProviderRegistry:
@@ -118,19 +121,24 @@ def _ensure_providers_loaded() -> None:
     if _providers_loaded:
         return
 
-    # Import provider modules to trigger registration
-    import contextlib
+    with _registry_lock:
+        # Double-check after acquiring lock
+        if _providers_loaded:
+            return
 
-    with contextlib.suppress(ImportError):
-        from agent.providers import openai as _  # noqa: F401
+        # Import provider modules to trigger registration
+        import contextlib
 
-    with contextlib.suppress(ImportError):
-        from agent.providers import anthropic as _  # noqa: F401
+        with contextlib.suppress(ImportError):
+            from agent.providers import openai as _  # noqa: F401
 
-    with contextlib.suppress(ImportError):
-        from agent.providers import gemini as _  # noqa: F401
+        with contextlib.suppress(ImportError):
+            from agent.providers import anthropic as _  # noqa: F401
 
-    with contextlib.suppress(ImportError):
-        from agent.providers import deepseek as _  # noqa: F401
+        with contextlib.suppress(ImportError):
+            from agent.providers import gemini as _  # noqa: F401
 
-    _providers_loaded = True
+        with contextlib.suppress(ImportError):
+            from agent.providers import deepseek as _  # noqa: F401
+
+        _providers_loaded = True

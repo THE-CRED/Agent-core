@@ -53,12 +53,16 @@ class RateLimitError(ProviderError):
         self.retry_after = retry_after
 
 
-class TimeoutError(AgentError):
+class RequestTimeoutError(AgentError):
     """Raised when a request times out."""
 
     def __init__(self, message: str, *, timeout: float | None = None, raw: Any = None):
         super().__init__(message, raw=raw)
         self.timeout = timeout
+
+
+# Backwards compatibility alias
+TimeoutError = RequestTimeoutError
 
 
 class ToolExecutionError(AgentError):

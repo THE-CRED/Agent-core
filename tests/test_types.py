@@ -316,7 +316,7 @@ class TestStreamEvent:
     def test_tool_call_delta_event(self):
         e = StreamEvent.tool_call_delta_event("c1", {"args": "partial"})
         assert e.type == "tool_call_delta"
-        assert e.tool_call_delta["id"] == "c1"
+        assert e.tool_call_delta is not None and e.tool_call_delta["id"] == "c1"
 
     def test_tool_result_event(self):
         e = StreamEvent.tool_result_event("c1", "result")
@@ -341,7 +341,7 @@ class TestStreamEvent:
         u = Usage(prompt_tokens=5, completion_tokens=10, total_tokens=15)
         e = StreamEvent.usage_event(u)
         assert e.type == "usage"
-        assert e.usage.total_tokens == 15
+        assert e.usage is not None and e.usage.total_tokens == 15
 
     def test_error_event(self):
         e = StreamEvent.error_event("something broke")

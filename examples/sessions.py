@@ -78,10 +78,10 @@ def forking_sessions():
 
     # Each branch continues independently
     tokyo_response = tokyo_branch.run("What should I see in Tokyo?")
-    print(f"Tokyo branch: {tokyo_response.text[:100]}...")
+    print(f"Tokyo branch: {(tokyo_response.text or '')[:100]}...")
 
     kyoto_response = kyoto_branch.run("What should I see in Kyoto?")
-    print(f"Kyoto branch: {kyoto_response.text[:100]}...")
+    print(f"Kyoto branch: {(kyoto_response.text or '')[:100]}...")
 
     # Main session is unchanged
     print(f"\nMain session messages: {len(main.messages)}")
@@ -117,7 +117,7 @@ def session_serialization():
 
     # Continue the conversation
     response = restored.run("Can you show me an example?")
-    print(f"Restored and continued: {response.text[:100]}...")
+    print(f"Restored and continued: {(response.text or '')[:100]}...")
 
 
 # ============================================================================

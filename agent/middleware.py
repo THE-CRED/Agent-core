@@ -123,11 +123,15 @@ class RedactionMiddleware(Middleware):
         return text
 
     def before(self, request: AgentRequest) -> AgentRequest:
-        # Note: This modifies for logging purposes, not the actual request
-        # In a real implementation, you might want to create a copy
+        # Redact sensitive data from request input before it reaches logs/traces
+        if request.input:
+            request.input = self._redact(request.input)
         return request
 
     def after(self, request: AgentRequest, response: AgentResponse) -> AgentResponse:
+        # Redact sensitive data from response text
+        if response.text:
+            response.text = self._redact(response.text)
         return response
 
 

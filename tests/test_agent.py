@@ -42,6 +42,7 @@ class TestAgent:
         agent.run("Hi", system="You are a helpful assistant")
 
         request = provider.get_last_request()
+        assert request is not None
         assert request.system == "You are a helpful assistant"
 
     def test_default_system_prompt(self):
@@ -52,6 +53,7 @@ class TestAgent:
         agent.run("Hi")
 
         request = provider.get_last_request()
+        assert request is not None
         assert request.system == "Default system"
 
     def test_temperature_override(self):
@@ -62,6 +64,7 @@ class TestAgent:
         agent.run("Hi", temperature=0.9)
 
         request = provider.get_last_request()
+        assert request is not None
         assert request.temperature == 0.9
 
     def test_multiple_responses(self):
