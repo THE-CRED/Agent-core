@@ -4,6 +4,7 @@ Agent router for multi-agent routing and fallback.
 
 import asyncio
 import concurrent.futures
+import threading
 from collections.abc import Callable
 from typing import Any
 
@@ -64,6 +65,7 @@ class AgentRouter:
         self.strategy = RoutingStrategy(strategy) if isinstance(strategy, str) else strategy
         self.custom_router = custom_router
         self._round_robin_index = 0
+        self._rr_lock = threading.Lock()
 
         if self.strategy == RoutingStrategy.CUSTOM and not custom_router:
             raise ValueError("custom_router required when strategy is CUSTOM")
@@ -350,14 +352,15 @@ class AgentRouter:
     def _run_round_robin(self, request: AgentRequest) -> AgentResponse:
         """Rotate through agents."""
         errors: list[Exception] = []
-        start_index = self._round_robin_index
+        with self._rr_lock:
+            start_index = self._round_robin_index
+            self._round_robin_index = (start_index + 1) % len(self.agents)
 
         for i in range(len(self.agents)):
             index = (start_index + i) % len(self.agents)
             agent = self.agents[index]
 
             try:
-                self._round_robin_index = (index + 1) % len(self.agents)
                 return agent._runtime.run(request)
             except AgentError as e:
                 errors.append(e)
@@ -371,14 +374,15 @@ class AgentRouter:
     async def _run_round_robin_async(self, request: AgentRequest) -> AgentResponse:
         """Rotate through agents (async)."""
         errors: list[Exception] = []
-        start_index = self._round_robin_index
+        with self._rr_lock:
+            start_index = self._round_robin_index
+            self._round_robin_index = (start_index + 1) % len(self.agents)
 
         for i in range(len(self.agents)):
             index = (start_index + i) % len(self.agents)
             agent = self.agents[index]
 
             try:
-                self._round_robin_index = (index + 1) % len(self.agents)
                 return await agent._runtime.run_async(request)
             except AgentError as e:
                 errors.append(e)
@@ -397,7 +401,12 @@ class AgentRouter:
             errors: list[Exception] = []
             for future in concurrent.futures.as_completed(futures):
                 try:
-                    return future.result()
+                    result = future.result()
+                    # Cancel remaining futures
+                    for f in futures:
+                        if f is not future and not f.done():
+                            f.cancel()
+                    return result
                 except AgentError as e:
                     errors.append(e)
                     continue
@@ -421,9 +430,11 @@ class AgentRouter:
         for task in done:
             try:
                 result = task.result()
-                # Cancel pending tasks
+                # Cancel pending tasks and wait for cancellation
                 for p in pending:
                     p.cancel()
+                if pending:
+                    await asyncio.gather(*pending, return_exceptions=True)
                 return result
             except AgentError as e:
                 errors.append(e)
@@ -442,16 +453,16 @@ class AgentRouter:
             errors=errors,
         )
 
+    @staticmethod
+    def _get_agent_cost(agent: Agent) -> float:
+        """Estimate cost for an agent based on model pricing."""
+        model = resolve_model(agent.model)
+        pricing = PRICING.get(model, {})
+        return pricing.get("input", float("inf")) + pricing.get("output", float("inf"))
+
     def _run_cheapest(self, request: AgentRequest) -> AgentResponse:
         """Use the cheapest available agent."""
-
-        # Sort agents by estimated cost
-        def get_cost(agent: Agent) -> float:
-            model = resolve_model(agent.model)
-            pricing = PRICING.get(model, {})
-            return pricing.get("input", float("inf")) + pricing.get("output", float("inf"))
-
-        sorted_agents = sorted(self.agents, key=get_cost)
+        sorted_agents = sorted(self.agents, key=self._get_agent_cost)
 
         errors: list[Exception] = []
         for agent in sorted_agents:
@@ -468,13 +479,7 @@ class AgentRouter:
 
     async def _run_cheapest_async(self, request: AgentRequest) -> AgentResponse:
         """Use the cheapest available agent (async)."""
-
-        def get_cost(agent: Agent) -> float:
-            model = resolve_model(agent.model)
-            pricing = PRICING.get(model, {})
-            return pricing.get("input", float("inf")) + pricing.get("output", float("inf"))
-
-        sorted_agents = sorted(self.agents, key=get_cost)
+        sorted_agents = sorted(self.agents, key=self._get_agent_cost)
 
         errors: list[Exception] = []
         for agent in sorted_agents:
@@ -577,19 +582,13 @@ class AgentRouter:
     def _get_ordered_agents(self) -> list[Agent]:
         """Get agents in order based on strategy."""
         if self.strategy == RoutingStrategy.ROUND_ROBIN:
-            # Rotate starting point
-            start = self._round_robin_index
-            self._round_robin_index = (start + 1) % len(self.agents)
+            with self._rr_lock:
+                start = self._round_robin_index
+                self._round_robin_index = (start + 1) % len(self.agents)
             return self.agents[start:] + self.agents[:start]
 
         if self.strategy == RoutingStrategy.CHEAPEST:
-
-            def get_cost(agent: Agent) -> float:
-                model = resolve_model(agent.model)
-                pricing = PRICING.get(model, {})
-                return pricing.get("input", float("inf")) + pricing.get("output", float("inf"))
-
-            return sorted(self.agents, key=get_cost)
+            return sorted(self.agents, key=self._get_agent_cost)
 
         return self.agents
 

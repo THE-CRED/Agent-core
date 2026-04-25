@@ -282,7 +282,7 @@ class TestPrepareStructuredRequest:
     def test_modifies_system_prompt_when_native_not_supported(self):
         system, json_schema = prepare_structured_request(PersonSchema, "sys", False)
         assert json_schema is None
-        assert "sys" in system
+        assert system is not None and "sys" in system
         assert "JSON" in system
 
     def test_creates_system_prompt_when_none_and_not_native(self):
@@ -470,7 +470,7 @@ class TestExecutionRuntime:
         response = runtime.run(simple_request)
         assert response.text == "Hi there"
         assert response.latency_ms is not None
-        assert response.latency_ms > 0
+        assert response.latency_ms is not None and response.latency_ms > 0
 
     def test_run_records_cost_estimate(self, fake_provider, agent_config, simple_request):
         fake_provider.set_response(
@@ -646,7 +646,7 @@ class TestExecutionRuntime:
         runtime = ExecutionRuntime(provider=fake_provider, config=agent_config)
         response = await runtime.run_async(simple_request)
         assert response.text == "async hi"
-        assert response.latency_ms > 0
+        assert response.latency_ms is not None and response.latency_ms > 0
 
     @pytest.mark.asyncio
     async def test_run_async_with_tools(self, fake_provider, agent_config, greet_tool):

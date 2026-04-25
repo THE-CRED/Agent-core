@@ -2,6 +2,7 @@
 Google Gemini provider adapter.
 """
 
+import uuid
 from collections.abc import AsyncIterator, Iterator
 from typing import Any, NoReturn
 
@@ -290,7 +291,7 @@ class GeminiProvider(BaseProvider):
                     fc = part.function_call
                     tool_calls.append(
                         ToolCall(
-                            id=f"call_{fc.name}_{len(tool_calls)}",
+                            id=f"call_{uuid.uuid4().hex[:12]}",
                             name=fc.name,
                             arguments=dict(fc.args) if fc.args else {},
                         )
@@ -336,7 +337,7 @@ class GeminiProvider(BaseProvider):
                     fc = part.function_call
                     yield StreamEvent.tool_call_start(
                         ToolCall(
-                            id=f"call_{fc.name}",
+                            id=f"call_{uuid.uuid4().hex[:12]}",
                             name=fc.name,
                             arguments=dict(fc.args) if fc.args else {},
                         ),
@@ -345,16 +346,36 @@ class GeminiProvider(BaseProvider):
 
     def _handle_error(self, e: Exception) -> NoReturn:
         """Convert Gemini errors to Agent errors."""
+        # Re-raise if already an Agent error
+        if isinstance(e, (AuthenticationError, RateLimitError, AgentTimeoutError, ProviderError)):
+            raise
+
+        # Check for specific exception types from the SDK
+        error_type = type(e).__name__
         error_str = str(e).lower()
 
-        if "api key" in error_str or "authentication" in error_str:
-            raise AuthenticationError(str(e), raw=e)
-        elif "rate limit" in error_str or "quota" in error_str:
-            raise RateLimitError(str(e), provider=self.name, raw=e)
-        elif "timeout" in error_str:
-            raise AgentTimeoutError(str(e), timeout=self.timeout, raw=e)
+        if (
+            error_type in ("PermissionDenied", "Unauthenticated")
+            or "api key" in error_str
+            or "authentication" in error_str
+            or "permission denied" in error_str
+        ):
+            raise AuthenticationError(str(e), raw=e) from e
+        elif (
+            error_type == "ResourceExhausted"
+            or "rate limit" in error_str
+            or "quota" in error_str
+            or "429" in error_str
+        ):
+            raise RateLimitError(str(e), provider=self.name, raw=e) from e
+        elif (
+            error_type in ("DeadlineExceeded",)
+            or isinstance(e, TimeoutError)
+            or "timeout" in error_str
+        ):
+            raise AgentTimeoutError(str(e), timeout=self.timeout, raw=e) from e
         else:
-            raise ProviderError(str(e), provider=self.name, raw=e)
+            raise ProviderError(str(e), provider=self.name, raw=e) from e
 
 
 # Register the provider

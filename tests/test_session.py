@@ -60,6 +60,7 @@ class TestSession:
 
         # Verify history is passed to second request
         request = provider.get_last_request()
+        assert request is not None
         assert len(request.messages) == 2  # First exchange
 
     def test_session_clear(self):

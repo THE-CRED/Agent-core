@@ -96,8 +96,8 @@ class Session:
             input=input,
             messages=self._messages.copy(),
             system=self._system,
-            temperature=temperature or self._agent.config.temperature,
-            max_tokens=max_tokens or self._agent.config.max_tokens,
+            temperature=temperature if temperature is not None else self._agent.config.temperature,
+            max_tokens=max_tokens if max_tokens is not None else self._agent.config.max_tokens,
             metadata=metadata or {},
             session_id=self._session_id,
         )
@@ -144,8 +144,8 @@ class Session:
             input=input,
             messages=self._messages.copy(),
             system=self._system,
-            temperature=temperature or self._agent.config.temperature,
-            max_tokens=max_tokens or self._agent.config.max_tokens,
+            temperature=temperature if temperature is not None else self._agent.config.temperature,
+            max_tokens=max_tokens if max_tokens is not None else self._agent.config.max_tokens,
             metadata=metadata or {},
             session_id=self._session_id,
         )
@@ -191,8 +191,8 @@ class Session:
             input=input,
             messages=self._messages.copy(),
             system=self._system,
-            temperature=temperature or self._agent.config.temperature,
-            max_tokens=max_tokens or self._agent.config.max_tokens,
+            temperature=temperature if temperature is not None else self._agent.config.temperature,
+            max_tokens=max_tokens if max_tokens is not None else self._agent.config.max_tokens,
             metadata=metadata or {},
             session_id=self._session_id,
         )
@@ -230,8 +230,8 @@ class Session:
             input=input,
             messages=self._messages.copy(),
             system=self._system,
-            temperature=temperature or self._agent.config.temperature,
-            max_tokens=max_tokens or self._agent.config.max_tokens,
+            temperature=temperature if temperature is not None else self._agent.config.temperature,
+            max_tokens=max_tokens if max_tokens is not None else self._agent.config.max_tokens,
             metadata=metadata or {},
             session_id=self._session_id,
         )
@@ -270,8 +270,8 @@ class Session:
             input=input,
             messages=self._messages.copy(),
             system=self._system,
-            temperature=temperature or self._agent.config.temperature,
-            max_tokens=max_tokens or self._agent.config.max_tokens,
+            temperature=temperature if temperature is not None else self._agent.config.temperature,
+            max_tokens=max_tokens if max_tokens is not None else self._agent.config.max_tokens,
             metadata=metadata or {},
             session_id=self._session_id,
         )
@@ -279,7 +279,62 @@ class Session:
         response = self._agent._runtime.run(request, schema=schema)
 
         self._messages.append(Message.user(input))
-        self._messages.append(Message.assistant(content=response.text or ""))
+        if response.has_tool_calls:
+            self._messages.append(
+                Message.assistant(
+                    content=response.text or "",
+                    tool_calls=[tc.to_dict() for tc in response.tool_calls],
+                )
+            )
+        else:
+            self._messages.append(Message.assistant(content=response.text or ""))
+
+        return response
+
+    async def json_async(
+        self,
+        input: str,
+        *,
+        schema: type[BaseModel] | dict[str, Any],
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> AgentResponse:
+        """
+        Send a message expecting structured JSON output asynchronously.
+
+        Args:
+            input: User message
+            schema: Pydantic model or JSON schema
+            temperature: Sampling temperature
+            max_tokens: Max tokens
+            metadata: Request metadata
+
+        Returns:
+            AgentResponse with parsed output
+        """
+        request = AgentRequest(
+            input=input,
+            messages=self._messages.copy(),
+            system=self._system,
+            temperature=temperature if temperature is not None else self._agent.config.temperature,
+            max_tokens=max_tokens if max_tokens is not None else self._agent.config.max_tokens,
+            metadata=metadata or {},
+            session_id=self._session_id,
+        )
+
+        response = await self._agent._runtime.run_async(request, schema=schema)
+
+        self._messages.append(Message.user(input))
+        if response.has_tool_calls:
+            self._messages.append(
+                Message.assistant(
+                    content=response.text or "",
+                    tool_calls=[tc.to_dict() for tc in response.tool_calls],
+                )
+            )
+        else:
+            self._messages.append(Message.assistant(content=response.text or ""))
 
         return response
 

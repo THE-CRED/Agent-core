@@ -129,3 +129,7 @@ class BaseProvider(ABC):
         if not self.api_key:
             errors.append(f"API key required for {self.name} provider")
         return errors
+
+    def __repr__(self) -> str:
+        masked_key = "***" if self.api_key else "None"
+        return f"{self.__class__.__name__}(name={self.name!r}, api_key={masked_key!r})"

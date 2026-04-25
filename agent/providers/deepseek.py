@@ -66,6 +66,9 @@ class DeepSeekProvider(BaseProvider):
         )
 
         # Use OpenAI provider with DeepSeek endpoint
+        # Default to deepseek-chat if no model specified
+        if "model" not in kwargs:
+            kwargs["model"] = "deepseek-chat"
         assert OpenAIProvider is not None
         self._openai_provider = OpenAIProvider(
             api_key=api_key,

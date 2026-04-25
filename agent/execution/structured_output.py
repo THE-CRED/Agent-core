@@ -67,7 +67,11 @@ class StructuredOutputHandler:
                 # Try to repair if we have attempts left
                 if attempt < self.repair_attempts:
                     with contextlib.suppress(Exception):
-                        text = repair_json(text, e)
+                        repaired = repair_json(text, e)
+                        if repaired == text:
+                            # Repair didn't change anything, no point retrying
+                            break
+                        text = repaired
 
         # All attempts failed
         raise SchemaValidationError(

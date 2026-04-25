@@ -394,8 +394,8 @@ class Agent:
             temperature=new_config.temperature,
             max_tokens=new_config.max_tokens,
             top_p=new_config.top_p,
-            tools=self._tools,
-            middleware=self._middleware.middlewares,
+            tools=list(self._tools),
+            middleware=list(self._middleware.middlewares),
             default_system=new_config.default_system,
             **new_config.extra,
         )
@@ -415,10 +415,10 @@ class Agent:
         return AgentRequest(
             input=input,
             messages=messages or [],
-            system=system or self.config.default_system,
-            temperature=temperature or self.config.temperature,
-            max_tokens=max_tokens or self.config.max_tokens,
-            top_p=top_p or self.config.top_p,
+            system=system if system is not None else self.config.default_system,
+            temperature=temperature if temperature is not None else self.config.temperature,
+            max_tokens=max_tokens if max_tokens is not None else self.config.max_tokens,
+            top_p=top_p if top_p is not None else self.config.top_p,
             stop=stop,
             metadata=metadata or {},
         )

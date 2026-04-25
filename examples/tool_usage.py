@@ -112,7 +112,7 @@ def search_database(query: str) -> str:
         {"id": 3, "name": "USB-C Hub", "price": 79, "stock": 75},
     ]
 
-    results = [p for p in products if query.lower() in p["name"].lower()]
+    results = [p for p in products if query.lower() in str(p["name"]).lower()]
     if results:
         return json.dumps(results, indent=2)
     return "No products found"

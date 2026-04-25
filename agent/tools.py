@@ -8,8 +8,9 @@ Python functions as tools that can be called by LLMs.
 import asyncio
 import inspect
 import json
+import types
 from collections.abc import Callable
-from typing import Any, get_type_hints
+from typing import Any, Literal, Union, get_origin, get_type_hints, overload
 
 from pydantic import BaseModel
 
@@ -62,8 +63,20 @@ class Tool:
         """Execute the tool synchronously."""
         try:
             if self.is_async:
-                # Run async function in new event loop
-                return asyncio.run(self.function(**arguments))
+                # Run async function - handle both cases:
+                # 1. No running loop: use asyncio.run()
+                # 2. Running loop: create new loop in thread
+                try:
+                    asyncio.get_running_loop()
+                    # Already in an event loop - run in a new thread
+                    import concurrent.futures
+
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                        future = pool.submit(asyncio.run, self.function(**arguments))
+                        result = future.result()
+                except RuntimeError:
+                    # No running event loop
+                    result = asyncio.run(self.function(**arguments))
             else:
                 result = self.function(**arguments)
 
@@ -80,7 +93,7 @@ class Tool:
 
 def _get_json_schema_type(python_type: Any) -> dict[str, Any]:
     """Convert Python type to JSON Schema type."""
-    origin = getattr(python_type, "__origin__", None)
+    origin = get_origin(python_type)
 
     # Handle None
     if python_type is type(None):
@@ -111,24 +124,23 @@ def _get_json_schema_type(python_type: Any) -> dict[str, Any]:
     if origin is dict:
         return {"type": "object"}
 
-    # Handle Optional (Union with None)
-    if origin is type(None | str):  # Union type
+    # Handle Literal
+    if origin is Literal:
+        args = getattr(python_type, "__args__", ())
+        return {"enum": list(args)}
+
+    # Handle Optional / Union (Union with None)
+    if origin is Union or origin is types.UnionType:
         args = getattr(python_type, "__args__", ())
         non_none_types = [a for a in args if a is not type(None)]
         if len(non_none_types) == 1:
             schema = _get_json_schema_type(non_none_types[0])
-            # JSON Schema doesn't have a standard optional, just allow null
             return schema
         return {}
 
     # Handle Pydantic models
     if hasattr(python_type, "model_json_schema"):
         return python_type.model_json_schema()  # type: ignore[union-attr]
-
-    # Handle Literal
-    if origin is type(None):  # Literal
-        args = getattr(python_type, "__args__", ())
-        return {"enum": list(args)}
 
     # Default to object
     return {"type": "object"}
@@ -175,6 +187,21 @@ def _extract_description(func: Callable[..., Any]) -> str:
     # Get first line/paragraph of docstring
     lines = doc.strip().split("\n\n")
     return lines[0].strip()
+
+
+@overload
+def tool(func: Callable[..., Any]) -> Tool: ...
+
+
+@overload
+def tool(
+    func: None = None,
+    *,
+    name: str | None = None,
+    description: str | None = None,
+    timeout: float | None = None,
+    max_retries: int = 0,
+) -> Callable[[Callable[..., Any]], Tool]: ...
 
 
 def tool(

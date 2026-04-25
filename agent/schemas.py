@@ -100,8 +100,9 @@ def schema_to_prompt(schema: Schema) -> str:
     json_schema = schema.json_schema
 
     # Get the schema name if available
+    name = json_schema.get("title", "response")
     # Build the prompt
-    prompt = f"Respond with a JSON object matching this schema:\n\n```json\n{json.dumps(json_schema, indent=2)}\n```\n\n"
+    prompt = f"Respond with a JSON object for '{name}' matching this schema:\n\n```json\n{json.dumps(json_schema, indent=2)}\n```\n\n"
     prompt += "IMPORTANT: Return ONLY the JSON object, no other text."
 
     return prompt
@@ -136,8 +137,8 @@ def extract_json(text: str) -> dict[str, Any]:
                 continue
 
     # Try to find JSON object in text
-    # Look for object boundaries
-    brace_pattern = r"\{.*\}"
+    # Look for object boundaries (non-greedy to get smallest valid match)
+    brace_pattern = r"\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}"
     matches = re.findall(brace_pattern, text, re.DOTALL)
     for match in matches:
         try:

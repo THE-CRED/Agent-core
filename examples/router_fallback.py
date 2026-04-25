@@ -199,7 +199,7 @@ def production_pattern():
             temperature=0.7,
         )
         print(f"Success via {response.provider}/{response.model}")
-        print(f"Response: {response.text[:100]}...")
+        print(f"Response: {(response.text or '')[:100]}...")
         if response.cost_estimate:
             print(f"Estimated cost: ${response.cost_estimate:.6f}")
     except Exception as e:
